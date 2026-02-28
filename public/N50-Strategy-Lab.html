@@ -354,22 +354,35 @@ select option{background:var(--p2)}
 
 .nodata{text-align:center;padding:16px;color:var(--t3);font-size:8px;letter-spacing:1px;line-height:2}
 
-/* Final mobile overrides (must be after base rules) */
+/* Final responsive overrides */
 @media (max-width: 768px) {
   html, body {
+    width: 100% !important;
+    max-width: 100% !important;
     height: 100% !important;
     overflow: hidden !important;
   }
 
+  .topbar, .workspace, .center, .ctb, .chart-wrap, .btabs, .bpanel {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
   .topbar {
     height: auto !important;
+    flex-wrap: wrap !important;
     padding: 6px 8px !important;
     gap: 6px !important;
-    flex-wrap: wrap !important;
+  }
+
+  .logo {
+    border-right: none !important;
+    padding-right: 0 !important;
   }
 
   .logo-text {
-    font-size: 14px !important;
+    font-size: 13px !important;
   }
 
   .logo-sub {
@@ -380,7 +393,40 @@ select option{background:var(--p2)}
     display: flex !important;
   }
 
+  .ticker {
+    order: 3 !important;
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    overflow: hidden !important;
+  }
+
+  .ti {
+    min-width: 0 !important;
+    border-right: 1px solid var(--b1) !important;
+    padding: 4px 6px !important;
+  }
+
+  .ti:nth-child(n+5) {
+    display: none !important;
+  }
+
+  .ti-v {
+    font-size: 11px !important;
+  }
+
+  .tb-right {
+    order: 2 !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+  }
+
   .workspace {
+    display: flex !important;
+    flex-direction: column !important;
     flex: 1 1 auto !important;
     min-height: 0 !important;
     overflow: hidden !important;
@@ -405,95 +451,149 @@ select option{background:var(--p2)}
   }
 
   .center {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
     min-height: 0 !important;
-    display: grid !important;
-    grid-template-rows: auto minmax(220px, 44vh) auto minmax(170px, 1fr) !important;
     overflow: hidden !important;
   }
 
   .ctb {
     display: flex !important;
-    flex-wrap: nowrap !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    gap: 4px !important;
     padding: 4px 6px !important;
-    gap: 3px !important;
+    flex: 0 0 auto !important;
   }
 
   .tfb, .tb-sym {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex: 0 0 auto !important;
     font-size: 8px !important;
     padding: 4px 6px !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+  }
+
+  .divr {
+    display: none !important;
   }
 
   .chart-wrap {
-    height: auto !important;
+    flex: 0 0 auto !important;
+    height: clamp(220px, 42vh, 340px) !important;
     min-height: 220px !important;
-    max-height: none !important;
+    max-height: 340px !important;
+    overflow: hidden !important;
   }
 
   .date-nav {
-    display: flex !important;
-    align-items: center !important;
+    display: grid !important;
+    grid-template-columns: 26px 26px 1fr 26px 26px 26px 26px !important;
+    align-items: stretch !important;
     height: 30px !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    white-space: nowrap !important;
+    overflow: hidden !important;
   }
 
   .nav-btn {
     width: 26px !important;
     min-width: 26px !important;
-    flex: 0 0 26px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    z-index: 2 !important;
+    font-size: 10px !important;
   }
 
   .minimap-wrap {
-    min-width: 120px !important;
-    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .nav-info {
+    display: none !important;
+  }
+
+  .chart-legend .leg-i:nth-child(n+5) {
+    display: none !important;
   }
 
   .btabs {
-    flex-wrap: nowrap !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-  }
-
-  .btab {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    overflow: hidden !important;
     flex: 0 0 auto !important;
   }
 
+  .btab {
+    text-align: center !important;
+    padding: 7px 4px !important;
+    font-size: 6px !important;
+    letter-spacing: 1px !important;
+  }
+
+  .bstats {
+    grid-column: 1 / -1 !important;
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 4px 8px !important;
+    font-size: 7px !important;
+  }
+
   .bpanel {
-    height: auto !important;
-    min-height: 170px !important;
+    flex: 1 1 auto !important;
+    min-height: 180px !important;
+    overflow: hidden !important;
+  }
+
+  .bpanel > div {
+    height: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
   }
 
   .tt {
-    min-width: 680px;
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+    font-size: 8px !important;
+  }
+
+  .tt th, .tt td {
+    padding: 4px 6px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .tt th:nth-child(1), .tt td:nth-child(1),
+  .tt th:nth-child(6), .tt td:nth-child(6) {
+    display: none !important;
   }
 
   .rpanel {
     display: none !important;
   }
+
+  #logoBtn {
+    width: 42px !important;
+    height: 42px !important;
+    right: 8px !important;
+    bottom: 8px !important;
+  }
 }
 
 @media (max-width: 480px) {
-  .center {
-    grid-template-rows: auto minmax(190px, 40vh) auto minmax(150px, 1fr) !important;
+  .ticker {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 
-  .minimap-wrap {
-    min-width: 80px !important;
+  .ti:nth-child(n+3) {
+    display: none !important;
+  }
+
+  .chart-wrap {
+    height: clamp(190px, 36vh, 280px) !important;
+    min-height: 190px !important;
+  }
+
+  .chart-legend .leg-i:nth-child(n+4) {
+    display: none !important;
   }
 }
 </style>
