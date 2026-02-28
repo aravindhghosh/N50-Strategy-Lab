@@ -1,0 +1,73 @@
+# N50 Strategy Lab
+
+N50 Strategy Lab is a comprehensive trading strategy scanner and analysis tool designed for NIFTY, BANK NIFTY, and other indices. It runs directly in the browser and provides real-time signal detection, historical backtesting, and performance metrics for multiple technical analysis strategies.
+
+## User Guide
+
+### ⚡ QUICK START
+1. Select **Symbol** (NIFTY / BANK NIFTY / SENSEX / FIN NIFTY) and **Timeframe** from the toolbar.
+2. Enable the strategies you want using the toggles in the left sidebar.
+3. Click **▶ SCAN STRATEGIES** — chart loads, signals appear, history scans automatically.
+4. Review **Current Signals** and **Best Combo** in the sidebar.
+5. Use **Trade History** tab to study past setups and win/loss patterns.
+
+### 📊 CHART CONTROLS
+- **Scroll wheel**: Zoom in/out at cursor position.
+- **Drag (left button)**: Pan chart left/right through history.
+- **Shift + Drag**: Stretch / compress price scale.
+- **Double-click**: Reset zoom to default view.
+- **◀◀ ◀ ▶ ▶▶ buttons**: Step back/forward 50 or 10 bars.
+- **Minimap drag**: Drag the blue viewport window to jump.
+- **Hover**: Tooltip shows OHLCV + EMA values.
+- **⏮ ⏭ buttons**: Jump to oldest / most recent bar.
+
+### 🎛️ CHART LAYERS (toolbar buttons)
+- **OB**: Order Block rectangles (blue=bull, red=bear).
+- **FVG**: Fair Value Gap bands (green=bull, orange=bear).
+- **LEVELS**: Session levels (Prev Close, Day Open/High/Low, Prev High/Low).
+- **SIGNAL**: Current best combo signal (Entry/SL/Target shading).
+- **EMA**: EMA Fast (yellow) and EMA Slow (blue) lines.
+- **VWAP**: Anchored VWAP line (teal) + standard deviations.
+
+### 📈 STRATEGIES — How Each One Works
+
+**📈 EMA CROSS (9/21)**
+Signals when the fast EMA (9) crosses the slow EMA (21). LONG when fast crosses above slow and price is above both; SHORT when fast crosses below. Confidence is highest on a fresh cross (C:3), lower during sustained trend (C:2) or weak separation (C:1). Stop is 1.5× ATR from entry.
+
+**🧱 ORDER BLOCK (OB)**
+Identifies the last bearish candle before a strong bullish impulse (Bull OB) or last bullish candle before a strong bearish push (Bear OB). These are institutional supply/demand zones. A signal fires when price returns to retest the OB. Active OBs show in solid boxes; broken ones fade with ✗. Confidence is boosted when EMA agrees.
+
+**⚡ FAIR VALUE GAP (FVG)**
+A 3-candle pattern where the body of candle 1 and candle 3 don't overlap — leaving a price gap that markets tend to fill. Bull FVG = gap above (green band), Bear FVG = gap below (orange band). Signal fires when price approaches an unfilled FVG. Filled FVGs shown faded with ✓.
+
+**🌊 ORDER FLOW (Delta)**
+Estimates buying vs selling pressure by analysing candle structure. A strong bullish candle closing near its high indicates more aggressive buyers (positive delta). Signal fires when delta momentum agrees with EMA direction. Long when sustained positive delta + uptrend; Short when sustained negative delta + downtrend.
+
+**💧 LIQUIDITY SWEEP**
+Detects when price wicks beyond a recent swing high/low (stop hunt) and then reverses. Institutions sweep liquidity above equal highs or below equal lows before reversing. LONG signal when price sweeps below a recent swing low and closes back above it; SHORT when price sweeps above a swing high and closes below.
+
+**📐 ANCHORED VWAP**
+VWAP anchored from the start of the current session (day open). Shows the fair value of the instrument relative to volume. LONG when price is above AVWAP and bouncing from the +1SD band; SHORT when price is below AVWAP and bouncing from the -1SD band. Drawn on chart as teal line with ±1SD and ±2SD bands.
+
+**📦 VOLUME PROFILE (POC)**
+Identifies the Point of Control (POC) — the price level with highest volume, which acts as a magnet. Also identifies Value Area High (VAH) and Value Area Low (VAL). LONG when price breaks above POC from below with increasing volume; SHORT when price breaks below POC from above. POC drawn as horizontal line on chart.
+
+### 🔥 CONFIDENCE SCORING & COMBOS
+Each strategy generates a confidence score (C:1, C:2, C:3). The app automatically generates **all possible combinations** of 2+ strategies that agree on direction. Higher combo confidence = stronger setup.
+- **C:3**: Fresh cross/retest (Highest quality)
+- **C:2**: Trend aligned (Good quality)
+- **C:1**: Conflicting signals (Lower quality)
+
+### 📋 TRADE HISTORY TAB
+The scanner backtests every bar in the lookback window. For each signal, it looks forward 60 bars to determine outcome:
+- **WIN**: Price hit target before SL
+- **LOSS**: Price hit SL before target
+- **OPEN**: Neither hit within 60 bars
+- **MISSED**: High-conf combo that won but wasn't tracked — study these!
+
+### 💰 RISK MANAGEMENT
+Set Capital and Risk % in the sidebar. The app calculates position size automatically:
+- **Risk Amount** = Capital × Risk %
+- **Qty** = Risk Amount ÷ (Entry − Stop Loss)
+- **Max Profit** = Qty × (Target − Entry) [for LONG]
+- **Rule**: Never risk more than 1-2% per trade. Default is 1%.
