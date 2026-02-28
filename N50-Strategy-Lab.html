@@ -57,10 +57,10 @@ body{display:flex;flex-direction:column}
 .mob-nav-btn span{font-size:16px;line-height:1}
 
 @media(max-width:768px){
-  html,body{overflow:hidden;height:100%;min-height:100%}
-  .workspace{flex-direction:column;flex:1;min-height:0}
+  html,body{overflow:auto;height:auto;min-height:100vh}
+  .workspace{flex-direction:column;flex:none;min-height:0}
   .sidebar{
-    position:fixed;left:-280px;top:0;bottom:0;width:min(82vw,280px);z-index:500;
+    position:fixed;left:-260px;top:0;bottom:52px;width:260px;z-index:500;
     transition:left .25s cubic-bezier(.4,0,.2,1);box-shadow:4px 0 20px rgba(0,0,0,.3);
     overflow-y:auto
   }
@@ -68,36 +68,30 @@ body{display:flex;flex-direction:column}
   .mob-overlay{display:block;opacity:0;pointer-events:none;transition:opacity .25s}
   .mob-overlay.show{opacity:1;pointer-events:all}
   .mob-toggle{display:flex}
-  .center{min-height:0;flex:1;display:flex;flex-direction:column}
-  .chart-wrap{height:46vh;min-height:220px;max-height:360px}
+  .mob-nav{display:flex}
+  .center{min-height:0;flex:none}
+  .chart-wrap{height:55vw;min-height:240px;max-height:320px}
   .rpanel{display:none}
-  .topbar{height:auto;flex-wrap:wrap;padding:6px 8px;gap:6px}
+  .topbar{height:auto;flex-wrap:wrap;padding:6px 8px;gap:4px}
   .logo{padding-right:8px;border-right:1px solid var(--b1)}
-  .logo-text{font-size:14px}
-  .logo-sub{display:none}
-  .ticker{order:3;gap:0;width:100%;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap}
-  .ti{flex:0 0 auto;padding:4px 8px;min-width:92px;border-right:1px solid var(--b1)}
-  .ti:nth-child(n+6){display:none}
-  .tb-right{order:2;width:calc(100% - 46px);justify-content:flex-start;padding:0;overflow-x:auto;gap:6px}
-  .tb-right > *{flex:0 0 auto}
-  .bpanel{height:38vh;min-height:190px;max-height:320px}
-  .ctb{padding:4px 6px;gap:3px;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden}
-  .tfb,.tb-sym{font-size:8px;padding:4px 6px;flex:0 0 auto}
-  .date-nav{height:30px}
+  .ticker{flex-wrap:wrap;gap:0;width:100%}
+  .ti{padding:4px 8px;min-width:70px;border-right:1px solid var(--b1)}
+  .tb-right{width:100%;justify-content:space-between;padding:4px 0 0 0;border-top:1px solid var(--b1)}
+  .bpanel{height:220px}
+  .ctb{padding:4px 6px;gap:3px}
+  .tfb{font-size:8px;padding:4px 6px}
+  .date-nav{height:28px}
   .minimap-wrap{flex:1}
   .nav-info{display:none}
   #logoBtn{bottom:60px!important;right:10px!important;width:44px!important;height:44px!important}
-  body{padding-bottom:0}
-  .btabs{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden}
-  .btab{flex:0 0 auto}
+  body{padding-bottom:52px}
+  .btabs{flex-wrap:wrap}
   .bstats{width:100%;padding:4px 8px;font-size:7px}
-  .tt{min-width:680px}
 }
 @media(max-width:480px){
-  .ticker .ti{min-width:84px;font-size:9px}
-  .ti:nth-child(n+5){display:none}
+  .ticker .ti{min-width:60px;font-size:9px}
   .ti-v{font-size:10px!important}
-  .chart-wrap{height:40vh;min-height:190px}
+  .chart-wrap{height:50vw;min-height:200px}
   .ctb .tfb[data-tf]{display:none}
   .ctb .tfb[data-tf].on{display:block}
   #chartInfo{display:none}
@@ -353,249 +347,6 @@ select option{background:var(--p2)}
 .ls{color:var(--green)}.le{color:var(--red)}.lw{color:var(--yellow)}.li{color:var(--cyan)}.lm{color:var(--t2)}.ld{color:var(--t3)}
 
 .nodata{text-align:center;padding:16px;color:var(--t3);font-size:8px;letter-spacing:1px;line-height:2}
-
-/* Final responsive overrides */
-@media (max-width: 768px) {
-  html, body {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: 100% !important;
-    overflow: hidden !important;
-  }
-
-  .topbar, .workspace, .center, .ctb, .chart-wrap, .btabs, .bpanel {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-  }
-
-  .topbar {
-    height: auto !important;
-    flex-wrap: wrap !important;
-    padding: 6px 8px !important;
-    gap: 6px !important;
-  }
-
-  .logo {
-    border-right: none !important;
-    padding-right: 0 !important;
-  }
-
-  .logo-text {
-    font-size: 13px !important;
-  }
-
-  .logo-sub {
-    display: none !important;
-  }
-
-  .mob-toggle {
-    display: flex !important;
-  }
-
-  .ticker {
-    order: 3 !important;
-    width: 100% !important;
-    display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    overflow: hidden !important;
-  }
-
-  .ti {
-    min-width: 0 !important;
-    border-right: 1px solid var(--b1) !important;
-    padding: 4px 6px !important;
-  }
-
-  .ti:nth-child(n+5) {
-    display: none !important;
-  }
-
-  .ti-v {
-    font-size: 11px !important;
-  }
-
-  .tb-right {
-    order: 2 !important;
-    width: 100% !important;
-    margin-left: 0 !important;
-    padding-left: 0 !important;
-    gap: 6px !important;
-    flex-wrap: wrap !important;
-  }
-
-  .workspace {
-    display: flex !important;
-    flex-direction: column !important;
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    overflow: hidden !important;
-  }
-
-  .sidebar {
-    position: fixed !important;
-    left: -280px !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    width: min(82vw, 280px) !important;
-    z-index: 500 !important;
-    box-shadow: 4px 0 20px rgba(0,0,0,.3) !important;
-  }
-
-  .sidebar.open {
-    left: 0 !important;
-  }
-
-  .mob-overlay {
-    display: block !important;
-  }
-
-  .center {
-    display: flex !important;
-    flex-direction: column !important;
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    overflow: hidden !important;
-  }
-
-  .ctb {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    align-items: center !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    gap: 4px !important;
-    padding: 4px 6px !important;
-    flex: 0 0 auto !important;
-  }
-
-  .tfb, .tb-sym {
-    font-size: 8px !important;
-    padding: 4px 6px !important;
-  }
-
-  .divr {
-    display: none !important;
-  }
-
-  .chart-wrap {
-    flex: 0 0 auto !important;
-    height: clamp(220px, 42vh, 340px) !important;
-    min-height: 220px !important;
-    max-height: 340px !important;
-    overflow: hidden !important;
-  }
-
-  .date-nav {
-    display: grid !important;
-    grid-template-columns: 26px 26px 1fr 26px 26px 26px 26px !important;
-    align-items: stretch !important;
-    height: 30px !important;
-    overflow: hidden !important;
-  }
-
-  .nav-btn {
-    width: 26px !important;
-    min-width: 26px !important;
-    font-size: 10px !important;
-  }
-
-  .minimap-wrap {
-    min-width: 0 !important;
-    overflow: hidden !important;
-  }
-
-  .nav-info {
-    display: none !important;
-  }
-
-  .chart-legend .leg-i:nth-child(n+5) {
-    display: none !important;
-  }
-
-  .btabs {
-    display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    overflow: hidden !important;
-    flex: 0 0 auto !important;
-  }
-
-  .btab {
-    text-align: center !important;
-    padding: 7px 4px !important;
-    font-size: 6px !important;
-    letter-spacing: 1px !important;
-  }
-
-  .bstats {
-    grid-column: 1 / -1 !important;
-    margin-left: 0 !important;
-    width: 100% !important;
-    padding: 4px 8px !important;
-    font-size: 7px !important;
-  }
-
-  .bpanel {
-    flex: 1 1 auto !important;
-    min-height: 180px !important;
-    overflow: hidden !important;
-  }
-
-  .bpanel > div {
-    height: 100% !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-  }
-
-  .tt {
-    width: 100% !important;
-    min-width: 0 !important;
-    table-layout: fixed !important;
-    font-size: 8px !important;
-  }
-
-  .tt th, .tt td {
-    padding: 4px 6px !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
-
-  .tt th:nth-child(1), .tt td:nth-child(1),
-  .tt th:nth-child(6), .tt td:nth-child(6) {
-    display: none !important;
-  }
-
-  .rpanel {
-    display: none !important;
-  }
-
-  #logoBtn {
-    width: 42px !important;
-    height: 42px !important;
-    right: 8px !important;
-    bottom: 8px !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .ticker {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-
-  .ti:nth-child(n+3) {
-    display: none !important;
-  }
-
-  .chart-wrap {
-    height: clamp(190px, 36vh, 280px) !important;
-    min-height: 190px !important;
-  }
-
-  .chart-legend .leg-i:nth-child(n+4) {
-    display: none !important;
-  }
-}
 </style>
 </head>
 <body>
@@ -603,8 +354,8 @@ select option{background:var(--p2)}
 <!-- ═══════ TOPBAR ═══════ -->
 <div class="topbar">
   <div class="logo">
-    <div class="logo-text"><em>N50</em> STRATEGY LAB</div>
-    <div class="logo-sub">v1</div>
+    <div class="logo-text"><em>N50</em> LAB</div>
+    <div class="logo-sub">v3</div>
   </div>
   <button class="mob-toggle" onclick="toggleSidebar()">☰</button>
   <div class="ticker">
@@ -3073,21 +2824,8 @@ function drawChartSR(ctx, xOf, yOf, cW, cH, PAD){
     if(e.target===this) this.style.display='none';
   });
 });
-// Sidebar ID + toggle for mobile
-const mobSidebar = document.querySelector('.sidebar');
-const mobOverlay = document.getElementById('mobOverlay');
-if (mobSidebar) mobSidebar.id = 'mobSidebar';
-
-function toggleSidebar(forceOpen){
-  if (!mobSidebar || !mobOverlay) return;
-  const open = typeof forceOpen === 'boolean' ? forceOpen : !mobSidebar.classList.contains('open');
-  mobSidebar.classList.toggle('open', open);
-  mobOverlay.classList.toggle('show', open);
-}
-
-window.addEventListener('resize', () => {
-  if (window.innerWidth > 768) toggleSidebar(false);
-});
+// Sidebar ID for mobile
+document.querySelector('.sidebar').id = 'mobSidebar';
 </script>
 
 <!-- LOGO BUTTON bottom-right -->
