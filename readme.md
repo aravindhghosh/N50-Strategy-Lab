@@ -1,74 +1,111 @@
-﻿# N50 Strategy Lab
+# N50 Strategy Lab (React)
 
-N50 Strategy Lab is a trading strategy scanner and chart analysis tool for NIFTY-family indices. It provides strategy signals, combo scoring, trade history scanning, and risk calculations in a browser-based interface.
+N50 Strategy Lab is a React-based intraday strategy scanner and charting dashboard for NIFTY-family indices.
 
 ## Disclaimer
-This project is for educational and informational use only.
-The creator is not a SEBI-registered investment advisor. Trading involves risk, including capital loss. Do your own research and consult a licensed advisor before making financial decisions.
+This project is for educational and informational use only. The creator is not a SEBI-registered investment advisor. Trading involves risk, including capital loss. Do your own research and consult a licensed advisor before making financial decisions.
 
-## Current Architecture
-- Main app runtime: React 19 + Vite
-- Core strategy/chart engine: original `N50-Strategy-Lab.html` (kept intact)
-- React integration approach: iframe wrapper that loads the original HTML and injects mobile responsive overrides
+## What This Version Includes
+- Full React app (no iframe wrapper)
+- Interactive canvas chart with:
+  - zoom, pan, minimap, crosshair, tooltip
+  - layer toggles: `OB`, `FVG`, `LS`, `LEVELS`, `SIGNAL`, `EMA`, `VWAP`, `VP`
+- Strategies:
+  - EMA Cross
+  - Order Block
+  - Fair Value Gap
+  - Order Flow* (synthetic)
+  - Liquidity Sweep
+  - Anchored VWAP
+  - Volume Profile* (approximate POC/VAH/VAL)
+- Combo engine with confidence scoring
+- Trade history backtest (WIN/LOSS/OPEN/MISSED)
+- S/R Insights modals:
+  - Last 7 days OHLC
+  - Daily/Weekly/Monthly S/R table
+  - S/R trade analysis with multi-timeframe confluence
+- Startup disclaimer modal
+- Portfolio floating action button
 
-## Features
-- Real-time strategy scanning (EMA Cross, OB, FVG, Order Flow, Liquidity Sweep, VWAP, Volume Profile)
-- Interactive HTML5 canvas chart with zoom/pan/crosshair and layer toggles
-- Historical signal scan and outcome tracking (WIN/LOSS/OPEN/MISSED)
-- Multi-symbol and multi-timeframe support
-- Built-in position sizing and risk controls
-- Dark/light theme support
-- Mobile-adaptive layout in React wrapper (design logic preserved)
+## Recent Enhancements Applied
+- Symbol/timeframe switch auto-scan
+- Live polling every `2s` during market hours (IST), with lighter fast refresh cycles
+- Performance tuning to reduce hangs:
+  - deferred/non-blocking history scan scheduling
+  - stale async scan/backtest cancellation guards
+  - lighter backtest window in auto cycles
+  - LS marker precompute instead of per-frame recalculation
+- S/R analysis improvements:
+  - true cross-timeframe clustering (D/W/M)
+  - setup validity guards (risk + level ordering checks)
+- UI labeling clarity for heuristic strategies (`OF*`, `VP*`)
 
 ## Tech Stack
-- React.js 19
-- JavaScript (ES6+)
-- JSX
-- HTML5
-- CSS3 (custom animations and responsive overrides)
-- Vite (dev/build tooling)
-- Yahoo Finance chart API (via CORS proxy)
+- React `18.2`
+- Zustand `4.x`
+- JavaScript (ES6+), JSX
+- HTML5 Canvas
+- CSS3
+- CRA + CRACO
+- Tailwind/PostCSS configured in project
 
 ## Project Structure
-- `src/`: React app shell (`App.jsx`, `main.jsx`, `styles.css`)
-- `public/N50-Strategy-Lab.html`: legacy strategy app loaded by React
-- `N50-Strategy-Lab.html` (root): original source kept as-is
-- `index.html`: Vite entry file
+```text
+src/
+  App.jsx
+  index.js
+  index.css
+  components/
+    Topbar.jsx
+    Sidebar.jsx
+    ChartToolbar.jsx
+    ChartCanvas.jsx
+    BottomPanel.jsx
+    RightPanel.jsx
+    GuideModal.jsx
+    InsightsModal.jsx
+    PortfolioFab.jsx
+  store/
+    useStore.js
+  utils/
+    dataFetch.js
+    indicators.js
+public/
+  index.html
+  N50-Strategy-Lab.html   (original source kept)
+N50-Strategy-Lab.html     (original source kept)
+```
 
-## Getting Started
-1. Install dependencies:
-`yarn install`
+## Setup
+```bash
+yarn install
+```
 
-2. Start development server:
-`yarn dev`
+## Run
+```bash
+yarn start
+```
 
-3. Build production bundle:
-`yarn build`
+## Build
+```bash
+yarn build
+```
 
-4. Preview production build:
-`yarn preview`
+## Deploy to GitHub Pages
+1. Ensure `gh-pages` is installed:
+```bash
+yarn add -D gh-pages
+```
+2. Deploy:
+```bash
+yarn deploy
+```
 
-## Deploy To GitHub Pages
-1. Make sure the repo is pushed to:
-`https://github.com/aravindhghosh/N50-Strategy-Lab`
-
-2. Build and publish:
-`yarn deploy`
-
-3. In GitHub repo settings:
-`Settings -> Pages -> Source: Deploy from a branch -> Branch: gh-pages`
+Current script behavior:
+- `predeploy` runs `yarn build`
+- `deploy` publishes `build/` to `gh-pages` branch
 
 ## Notes
-- Original files are preserved and not removed.
-- UI design and trading logic are intentionally unchanged from the original app.
-- Mobile adaptation is added through wrapper-level CSS overrides.
-
-## User Guide (Quick)
-1. Select symbol and timeframe.
-2. Enable desired strategies from the left panel.
-3. Click `SCAN STRATEGIES`.
-4. Review current signals and best combo.
-5. Use trade history to evaluate setup outcomes.
-
-## Acknowledgements
-Initial development assistance included AI tooling support.
+- Original legacy HTML files are preserved and not deleted.
+- Some strategy modules are heuristic approximations (`OF*`, `VP*`) and are labeled accordingly.
+- Live updates depend on data availability and market-open schedule checks.
