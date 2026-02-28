@@ -13,7 +13,7 @@ const useStore = create((set, get) => ({
   darkMode: false,
 
   // Strategy toggles
-  stratOn: { ema: true, ob: true, fvg: true, of: true, ls: true, vwap: true, vp: true },
+  stratOn: { ema: true, ob: true, fvg: true, of: false, ls: false, vwap: false, vp: false },
 
   // Layer toggles
   layers: { ob: true, fvg: true, ls: true, lvl: true, sig: true, ema: true, vwap: true, vp: true },

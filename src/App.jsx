@@ -179,7 +179,7 @@ export default function App() {
       if (autoDebounceTimerRef.current) clearTimeout(autoDebounceTimerRef.current);
       if (autoFullTimerRef.current) clearTimeout(autoFullTimerRef.current);
       autoDebounceTimerRef.current = setTimeout(() => {
-        runScan('auto', { fullHistory: false });
+        if (runScanRef.current) runScanRef.current('auto', { fullHistory: false });
         autoFullTimerRef.current = setTimeout(() => {
           const cur = useStore.getState();
           if (`${cur.sym}|${cur.tf}` === key && runScanRef.current) {
@@ -192,7 +192,17 @@ export default function App() {
       if (autoDebounceTimerRef.current) clearTimeout(autoDebounceTimerRef.current);
       if (autoFullTimerRef.current) clearTimeout(autoFullTimerRef.current);
     };
-  }, [sym, tf, runScan]);
+  }, [sym, tf]);
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      const st = useStore.getState();
+      if (!st.candles?.length && runScanRef.current) {
+        runScanRef.current('auto-init', { fullHistory: false });
+      }
+    }, 1500);
+    return () => clearTimeout(id);
+  }, []);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -225,15 +235,15 @@ export default function App() {
       {insightType && <InsightsModal type={insightType} onClose={() => setInsightType(null)} />}
       {showDisclaimer && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 2500, background: 'rgba(0,0,0,0.72)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-          <div style={{ width: '100%', maxWidth: 640, background: 'var(--p1)', border: '1px solid var(--b2)', borderRadius: 10, boxShadow: '0 16px 60px rgba(0,0,0,0.5)', overflow: 'hidden' }}>
-            <div style={{ background: 'var(--p2)', borderBottom: '1px solid var(--b1)', padding: '14px 16px', fontFamily: 'Syne, sans-serif', fontSize: 20, fontWeight: 800, color: 'var(--t1)', letterSpacing: 1 }}>
+          <div style={{ width: '100%', maxWidth: 640, background: 'rgba(70,0,10,0.95)', border: '1px solid rgba(255,45,85,0.55)', borderRadius: 10, boxShadow: '0 16px 60px rgba(0,0,0,0.6)', overflow: 'hidden' }}>
+            <div style={{ background: 'rgba(255,45,85,0.14)', borderBottom: '1px solid rgba(255,45,85,0.45)', padding: '14px 16px', fontFamily: 'Syne, sans-serif', fontSize: 20, fontWeight: 800, color: '#ffd7df', letterSpacing: 1 }}>
               Disclaimer
             </div>
-            <div style={{ padding: 16, color: 'var(--t2)', fontSize: 12, lineHeight: 1.8 }}>
+            <div style={{ padding: 16, color: '#ffe9ee', fontSize: 12, lineHeight: 1.8 }}>
               This project is for educational and informational use only. The creator is not a SEBI-registered investment advisor. Trading involves risk, including capital loss. Do your own research and consult a licensed advisor before making financial decisions.
             </div>
-            <div style={{ borderTop: '1px solid var(--b1)', padding: 12, display: 'flex', justifyContent: 'flex-end' }}>
-              <button className="btn-scan" style={{ width: 180 }} onClick={() => setShowDisclaimer(false)}>I Understand</button>
+            <div style={{ borderTop: '1px solid rgba(255,45,85,0.45)', padding: 12, display: 'flex', justifyContent: 'flex-end' }}>
+              <button className="btn-scan" style={{ width: 180, background: 'rgba(255,45,85,0.16)', borderColor: 'rgba(255,45,85,0.7)', color: '#ffd7df' }} onClick={() => setShowDisclaimer(false)}>I Understand</button>
             </div>
           </div>
         </div>

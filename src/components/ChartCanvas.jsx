@@ -22,7 +22,7 @@ export default function ChartCanvas({ onNavInfo }) {
   // Sync G_ref from store
   useEffect(() => {
     G_ref = { ...G_ref, candles: store.candles, ema1: store.ema1, ema2: store.ema2, obs: store.obs, fvgs: store.fvgs, session: store.session, vwapData: store.vwapData, vpData: store.vpData, layers: store.layers, results: store.results, emaFast: store.emaFast, emaSlow: store.emaSlow, tf: store.tf };
-  });
+  }, [store.candles, store.ema1, store.ema2, store.obs, store.fvgs, store.session, store.vwapData, store.vpData, store.layers, store.results, store.emaFast, store.emaSlow, store.tf]);
 
   useEffect(() => {
     const can = store.candles || [];
@@ -360,6 +360,7 @@ export default function ChartCanvas({ onNavInfo }) {
       canvas.style.cursor = V.dtype === 'price' ? 'ns-resize' : 'grabbing';
     }
     function onMouseMove(e) {
+      if (V.mmDrag) return;
       if (V.drag) {
         if (V.dtype === 'pan') {
           const cW = canvas.offsetWidth - PAD.l - PAD.r, span = V.dve - V.dvs;
@@ -431,7 +432,7 @@ export default function ChartCanvas({ onNavInfo }) {
   useEffect(() => {
     if (store.candles.length) { initView(); }
     scheduleDraw();
-  }, [store.candles, store.ema1, store.ema2, store.obs, store.fvgs, store.session, store.vwapData, store.vpData, store.layers, store.results, store.emaFast, store.emaSlow]);
+  }, [store.candles, store.ema1, store.ema2, store.obs, store.fvgs, store.session, store.vwapData, store.vpData, store.layers, store.results, store.emaFast, store.emaSlow, store.darkMode]);
   /* eslint-enable react-hooks/exhaustive-deps */
 
   const navStep = delta => { if (!G_ref.candles.length) return; V.s += delta; V.e += delta; V.pLo = null; V.pHi = null; clampView(); scheduleDraw(); };

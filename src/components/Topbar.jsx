@@ -37,7 +37,7 @@ export default function Topbar({ onShowGuide, onShowWeek }) {
         <div style={{ fontFamily: 'Syne, sans-serif', fontSize: 18, fontWeight: 800, color: 'var(--t1)', letterSpacing: 1 }}>
           <span style={{ color: 'var(--cyan)' }}>N50</span> STRATEGY LAB
         </div>
-        <div style={{ fontSize: 7, letterSpacing: 2, color: 'var(--t3)', padding: '2px 5px', border: '1px solid var(--b2)', borderRadius: 2 }}>v3</div>
+        <div style={{ fontSize: 7, letterSpacing: 2, color: 'var(--t3)', padding: '2px 5px', border: '1px solid var(--b2)', borderRadius: 2 }}>v1</div>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', flex: 1, overflow: 'hidden' }}>
