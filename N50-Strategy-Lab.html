@@ -57,10 +57,10 @@ body{display:flex;flex-direction:column}
 .mob-nav-btn span{font-size:16px;line-height:1}
 
 @media(max-width:768px){
-  html,body{overflow:auto;height:auto;min-height:100vh}
-  .workspace{flex-direction:column;flex:none;min-height:0}
+  html,body{overflow:hidden;height:100%;min-height:100%}
+  .workspace{flex-direction:column;flex:1;min-height:0}
   .sidebar{
-    position:fixed;left:-260px;top:0;bottom:52px;width:260px;z-index:500;
+    position:fixed;left:-280px;top:0;bottom:0;width:min(82vw,280px);z-index:500;
     transition:left .25s cubic-bezier(.4,0,.2,1);box-shadow:4px 0 20px rgba(0,0,0,.3);
     overflow-y:auto
   }
@@ -68,30 +68,36 @@ body{display:flex;flex-direction:column}
   .mob-overlay{display:block;opacity:0;pointer-events:none;transition:opacity .25s}
   .mob-overlay.show{opacity:1;pointer-events:all}
   .mob-toggle{display:flex}
-  .mob-nav{display:flex}
-  .center{min-height:0;flex:none}
-  .chart-wrap{height:55vw;min-height:240px;max-height:320px}
+  .center{min-height:0;flex:1;display:flex;flex-direction:column}
+  .chart-wrap{height:46vh;min-height:220px;max-height:360px}
   .rpanel{display:none}
-  .topbar{height:auto;flex-wrap:wrap;padding:6px 8px;gap:4px}
+  .topbar{height:auto;flex-wrap:wrap;padding:6px 8px;gap:6px}
   .logo{padding-right:8px;border-right:1px solid var(--b1)}
-  .ticker{flex-wrap:wrap;gap:0;width:100%}
-  .ti{padding:4px 8px;min-width:70px;border-right:1px solid var(--b1)}
-  .tb-right{width:100%;justify-content:space-between;padding:4px 0 0 0;border-top:1px solid var(--b1)}
-  .bpanel{height:220px}
-  .ctb{padding:4px 6px;gap:3px}
-  .tfb{font-size:8px;padding:4px 6px}
-  .date-nav{height:28px}
+  .logo-text{font-size:14px}
+  .logo-sub{display:none}
+  .ticker{order:3;gap:0;width:100%;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap}
+  .ti{flex:0 0 auto;padding:4px 8px;min-width:92px;border-right:1px solid var(--b1)}
+  .ti:nth-child(n+6){display:none}
+  .tb-right{order:2;width:calc(100% - 46px);justify-content:flex-start;padding:0;overflow-x:auto;gap:6px}
+  .tb-right > *{flex:0 0 auto}
+  .bpanel{height:38vh;min-height:190px;max-height:320px}
+  .ctb{padding:4px 6px;gap:3px;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden}
+  .tfb,.tb-sym{font-size:8px;padding:4px 6px;flex:0 0 auto}
+  .date-nav{height:30px}
   .minimap-wrap{flex:1}
   .nav-info{display:none}
   #logoBtn{bottom:60px!important;right:10px!important;width:44px!important;height:44px!important}
-  body{padding-bottom:52px}
-  .btabs{flex-wrap:wrap}
+  body{padding-bottom:0}
+  .btabs{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden}
+  .btab{flex:0 0 auto}
   .bstats{width:100%;padding:4px 8px;font-size:7px}
+  .tt{min-width:680px}
 }
 @media(max-width:480px){
-  .ticker .ti{min-width:60px;font-size:9px}
+  .ticker .ti{min-width:84px;font-size:9px}
+  .ti:nth-child(n+5){display:none}
   .ti-v{font-size:10px!important}
-  .chart-wrap{height:50vw;min-height:200px}
+  .chart-wrap{height:40vh;min-height:190px}
   .ctb .tfb[data-tf]{display:none}
   .ctb .tfb[data-tf].on{display:block}
   #chartInfo{display:none}
@@ -347,6 +353,149 @@ select option{background:var(--p2)}
 .ls{color:var(--green)}.le{color:var(--red)}.lw{color:var(--yellow)}.li{color:var(--cyan)}.lm{color:var(--t2)}.ld{color:var(--t3)}
 
 .nodata{text-align:center;padding:16px;color:var(--t3);font-size:8px;letter-spacing:1px;line-height:2}
+
+/* Final mobile overrides (must be after base rules) */
+@media (max-width: 768px) {
+  html, body {
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .topbar {
+    height: auto !important;
+    padding: 6px 8px !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .logo-text {
+    font-size: 14px !important;
+  }
+
+  .logo-sub {
+    display: none !important;
+  }
+
+  .mob-toggle {
+    display: flex !important;
+  }
+
+  .workspace {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .sidebar {
+    position: fixed !important;
+    left: -280px !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    width: min(82vw, 280px) !important;
+    z-index: 500 !important;
+    box-shadow: 4px 0 20px rgba(0,0,0,.3) !important;
+  }
+
+  .sidebar.open {
+    left: 0 !important;
+  }
+
+  .mob-overlay {
+    display: block !important;
+  }
+
+  .center {
+    min-height: 0 !important;
+    display: grid !important;
+    grid-template-rows: auto minmax(220px, 44vh) auto minmax(170px, 1fr) !important;
+    overflow: hidden !important;
+  }
+
+  .ctb {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding: 4px 6px !important;
+    gap: 3px !important;
+  }
+
+  .tfb, .tb-sym {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+    font-size: 8px !important;
+    padding: 4px 6px !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .chart-wrap {
+    height: auto !important;
+    min-height: 220px !important;
+    max-height: none !important;
+  }
+
+  .date-nav {
+    display: flex !important;
+    align-items: center !important;
+    height: 30px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    white-space: nowrap !important;
+  }
+
+  .nav-btn {
+    width: 26px !important;
+    min-width: 26px !important;
+    flex: 0 0 26px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 2 !important;
+  }
+
+  .minimap-wrap {
+    min-width: 120px !important;
+    flex: 1 1 auto !important;
+  }
+
+  .btabs {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+  }
+
+  .btab {
+    flex: 0 0 auto !important;
+  }
+
+  .bpanel {
+    height: auto !important;
+    min-height: 170px !important;
+  }
+
+  .tt {
+    min-width: 680px;
+  }
+
+  .rpanel {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .center {
+    grid-template-rows: auto minmax(190px, 40vh) auto minmax(150px, 1fr) !important;
+  }
+
+  .minimap-wrap {
+    min-width: 80px !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -2824,8 +2973,21 @@ function drawChartSR(ctx, xOf, yOf, cW, cH, PAD){
     if(e.target===this) this.style.display='none';
   });
 });
-// Sidebar ID for mobile
-document.querySelector('.sidebar').id = 'mobSidebar';
+// Sidebar ID + toggle for mobile
+const mobSidebar = document.querySelector('.sidebar');
+const mobOverlay = document.getElementById('mobOverlay');
+if (mobSidebar) mobSidebar.id = 'mobSidebar';
+
+function toggleSidebar(forceOpen){
+  if (!mobSidebar || !mobOverlay) return;
+  const open = typeof forceOpen === 'boolean' ? forceOpen : !mobSidebar.classList.contains('open');
+  mobSidebar.classList.toggle('open', open);
+  mobOverlay.classList.toggle('show', open);
+}
+
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 768) toggleSidebar(false);
+});
 </script>
 
 <!-- LOGO BUTTON bottom-right -->
