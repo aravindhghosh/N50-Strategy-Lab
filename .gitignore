@@ -1,0 +1,24 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env
+.env
+.env.*
+!.env.example
+
+# React/Vite app outputs
+node_modules/
+dist/
+.vite/
+
+# Editor
+.vscode/
+.idea/
