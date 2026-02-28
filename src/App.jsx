@@ -27,9 +27,12 @@ export default function App() {
   const queuedScanRef = useRef(false);
   const lastAutoKeyRef = useRef('');
   const autoFullTimerRef = useRef(null);
+  const autoDebounceTimerRef = useRef(null);
   const pollTickRef = useRef(0);
   const runTokenRef = useRef(0);
   const backtestTokenRef = useRef(0);
+  const dataCacheRef = useRef(new Map());
+  const sessionCacheRef = useRef(new Map());
   const isMarketOpenIST = () => {
     const ist = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
     const h = ist.getHours();
@@ -60,7 +63,22 @@ export default function App() {
     log(`Fetching ${curSym} [${curTf}m]...`, 'i');
 
     try {
-      const [candles, sess] = await Promise.all([fetchYF(curSym, curTf, log), fetchSession(curSym)]);
+      const cacheKey = `${curSym}|${curTf}`;
+      const now = Date.now();
+      const cachedData = dataCacheRef.current.get(cacheKey);
+      const cachedSession = sessionCacheRef.current.get(curSym);
+      const dataTTL = mode === 'manual' ? 3000 : 5000;
+      const sessionTTL = 60000;
+      const useCachedData = !!(cachedData && (now - cachedData.ts) < dataTTL);
+      const useCachedSession = !!(cachedSession && (now - cachedSession.ts) < sessionTTL);
+
+      const [candles, sess] = await Promise.all([
+        useCachedData ? Promise.resolve(cachedData.value) : fetchYF(curSym, curTf, log),
+        useCachedSession ? Promise.resolve(cachedSession.value) : fetchSession(curSym)
+      ]);
+
+      if (!useCachedData && candles?.length) dataCacheRef.current.set(cacheKey, { ts: Date.now(), value: candles });
+      if (!useCachedSession && sess) sessionCacheRef.current.set(curSym, { ts: Date.now(), value: sess });
       if (runTokenRef.current !== runToken) {
         if (!isBackground) setScanning(false);
         return;
@@ -86,7 +104,7 @@ export default function App() {
       const obs = detectOBs(candles);
       const fvgs = detectFVGs(candles);
       const vwapData = calcAnchoredVWAP(candles);
-      const vpData = calcVolumeProfile(candles);
+      const vpData = calcVolumeProfile(candles.slice(-700));
       const session = sess || simSession(candles);
 
       setData(candles, ema1, ema2, obs, fvgs, session, vwapData, vpData);
@@ -114,7 +132,7 @@ export default function App() {
       log('Scan complete', 's');
 
       if (fullHistory) {
-        const btLookback = mode === 'manual' ? lookback : Math.min(lookback, 60);
+        const btLookback = mode === 'manual' ? Math.min(lookback, 120) : Math.min(lookback, 50);
         const btDelay = mode === 'manual' ? 80 : 700;
         const btToken = ++backtestTokenRef.current;
         if (!isBackground) log(`Scheduling history scan (${btLookback} bars)...`, 'i');
@@ -158,16 +176,20 @@ export default function App() {
     const key = `${sym}|${tf}`;
     if (lastAutoKeyRef.current !== key) {
       lastAutoKeyRef.current = key;
+      if (autoDebounceTimerRef.current) clearTimeout(autoDebounceTimerRef.current);
       if (autoFullTimerRef.current) clearTimeout(autoFullTimerRef.current);
-      runScan('auto', { fullHistory: false });
-      autoFullTimerRef.current = setTimeout(() => {
-        const cur = useStore.getState();
-        if (`${cur.sym}|${cur.tf}` === key && runScanRef.current) {
-          runScanRef.current('auto-full', { fullHistory: true });
-        }
-      }, 1200);
+      autoDebounceTimerRef.current = setTimeout(() => {
+        runScan('auto', { fullHistory: false });
+        autoFullTimerRef.current = setTimeout(() => {
+          const cur = useStore.getState();
+          if (`${cur.sym}|${cur.tf}` === key && runScanRef.current) {
+            runScanRef.current('auto-full', { fullHistory: true });
+          }
+        }, 900);
+      }, 220);
     }
     return () => {
+      if (autoDebounceTimerRef.current) clearTimeout(autoDebounceTimerRef.current);
       if (autoFullTimerRef.current) clearTimeout(autoFullTimerRef.current);
     };
   }, [sym, tf, runScan]);

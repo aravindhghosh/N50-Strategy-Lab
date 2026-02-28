@@ -1,5 +1,6 @@
 const YF_SYM = { 'NSEI': '^NSEI', 'NSEBANK': '^NSEBANK', 'BSESN': '^BSESN', 'CNXFIN.NS': 'CNXFIN.NS' };
 const YF_CFG = { '1': {i:'1m',r:'7d'}, '3': {i:'5m',r:'7d'}, '5': {i:'5m',r:'60d'}, '15': {i:'15m',r:'60d'}, '30': {i:'30m',r:'60d'}, '60': {i:'60m',r:'730d'}, 'D': {i:'1d',r:'5y'} };
+const MAX_BARS = { '1': 1400, '3': 1400, '5': 1400, '15': 1200, '30': 1000, '60': 900, 'D': 800 };
 
 function simCandles(sym, tf) {
   const base = { NSEI: 24200, NSEBANK: 52000, BSESN: 80000, 'CNXFIN.NS': 23000 }[sym] || 24200;
@@ -31,8 +32,9 @@ export async function fetchYF(sym, tf, addLog) {
       if (!q.open[i] || !q.close[i] || !q.high[i] || !q.low[i]) continue;
       arr.push({ t: ts[i] * 1000, o: +q.open[i].toFixed(2), h: +q.high[i].toFixed(2), l: +q.low[i].toFixed(2), c: +q.close[i].toFixed(2), v: q.volume[i] || 0 });
     }
-    if (addLog) addLog(`${arr.length} candles [${sym} ${cfg.i}]`, 'i');
-    return arr;
+    const capped = arr.slice(-((MAX_BARS[tf] || 1200)));
+    if (addLog) addLog(`${capped.length} candles [${sym} ${cfg.i}]`, 'i');
+    return capped;
   } catch (e) {
     if (addLog) addLog('Fetch failed: ' + e.message + ' — using sim', 'w');
     return simCandles(sym, tf);
