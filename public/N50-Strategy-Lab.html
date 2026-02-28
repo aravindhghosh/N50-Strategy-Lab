@@ -42,6 +42,61 @@ body{display:flex;flex-direction:column}
 ::-webkit-scrollbar-thumb{background:var(--b3);border-radius:2px}
 ::-webkit-scrollbar-track{background:transparent}
 
+/* ─────────── MOBILE OVERLAY SIDEBAR ─────────── */
+.mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;backdrop-filter:blur(2px)}
+.mob-toggle{display:none;background:var(--p2);border:1px solid var(--b1);color:var(--t1);font-size:16px;
+  width:36px;height:36px;border-radius:4px;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ─────────── MOBILE BOTTOM NAV ─────────── */
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:52px;z-index:300;
+  background:var(--p1);border-top:1px solid var(--b1);flex-direction:row;align-items:stretch}
+.mob-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;font-size:7px;letter-spacing:.5px;color:var(--t3);cursor:pointer;border:none;
+  background:transparent;padding:4px 2px;transition:color .15s;text-transform:uppercase}
+.mob-nav-btn.active{color:var(--cyan)}
+.mob-nav-btn span{font-size:16px;line-height:1}
+
+@media(max-width:768px){
+  html,body{overflow:auto;height:auto;min-height:100vh}
+  .workspace{flex-direction:column;flex:none;min-height:0}
+  .sidebar{
+    position:fixed;left:-260px;top:0;bottom:52px;width:260px;z-index:500;
+    transition:left .25s cubic-bezier(.4,0,.2,1);box-shadow:4px 0 20px rgba(0,0,0,.3);
+    overflow-y:auto
+  }
+  .sidebar.open{left:0}
+  .mob-overlay{display:block;opacity:0;pointer-events:none;transition:opacity .25s}
+  .mob-overlay.show{opacity:1;pointer-events:all}
+  .mob-toggle{display:flex}
+  .mob-nav{display:flex}
+  .center{min-height:0;flex:none}
+  .chart-wrap{height:55vw;min-height:240px;max-height:320px}
+  .rpanel{display:none}
+  .topbar{height:auto;flex-wrap:wrap;padding:6px 8px;gap:4px}
+  .logo{padding-right:8px;border-right:1px solid var(--b1)}
+  .ticker{flex-wrap:wrap;gap:0;width:100%}
+  .ti{padding:4px 8px;min-width:70px;border-right:1px solid var(--b1)}
+  .tb-right{width:100%;justify-content:space-between;padding:4px 0 0 0;border-top:1px solid var(--b1)}
+  .bpanel{height:220px}
+  .ctb{padding:4px 6px;gap:3px}
+  .tfb{font-size:8px;padding:4px 6px}
+  .date-nav{height:28px}
+  .minimap-wrap{flex:1}
+  .nav-info{display:none}
+  #logoBtn{bottom:60px!important;right:10px!important;width:44px!important;height:44px!important}
+  body{padding-bottom:52px}
+  .btabs{flex-wrap:wrap}
+  .bstats{width:100%;padding:4px 8px;font-size:7px}
+}
+@media(max-width:480px){
+  .ticker .ti{min-width:60px;font-size:9px}
+  .ti-v{font-size:10px!important}
+  .chart-wrap{height:50vw;min-height:200px}
+  .ctb .tfb[data-tf]{display:none}
+  .ctb .tfb[data-tf].on{display:block}
+  #chartInfo{display:none}
+}
+
 /* ─────────── TOPBAR ─────────── */
 .topbar{
   display:flex;align-items:center;height:46px;flex-shrink:0;
@@ -299,34 +354,48 @@ select option{background:var(--p2)}
 <!-- ═══════ TOPBAR ═══════ -->
 <div class="topbar">
   <div class="logo">
-    <div class="logo-text"><em>N50</em> STRATEGY LAB</div>
-    <div class="logo-sub">v1</div>
+    <div class="logo-text"><em>N50</em> LAB</div>
+    <div class="logo-sub">v3</div>
   </div>
+  <button class="mob-toggle" onclick="toggleSidebar()">☰</button>
   <div class="ticker">
     <div class="ti"><div class="ti-l">LTP</div><div class="ti-v cy" id="t-ltp">--</div></div>
     <div class="ti"><div class="ti-l">CHANGE</div><div class="ti-v" id="t-chg">--</div></div>
-    <div class="ti"><div class="ti-l">PREV CLOSE</div><div class="ti-v" id="t-pc">--</div></div>
     <div class="ti"><div class="ti-l">DAY OPEN</div><div class="ti-v or" id="t-do">--</div></div>
     <div class="ti"><div class="ti-l">DAY HIGH</div><div class="ti-v up" id="t-dh">--</div></div>
     <div class="ti"><div class="ti-l">DAY LOW</div><div class="ti-v dn" id="t-dl">--</div></div>
+    <div class="ti"><div class="ti-l">DAY CLOSE</div><div class="ti-v" id="t-dc">--</div></div>
+    <div class="ti"><div class="ti-l">PREV CLOSE</div><div class="ti-v" id="t-pc">--</div></div>
     <div class="ti"><div class="ti-l">PREV HIGH</div><div class="ti-v ye" id="t-ph">--</div></div>
     <div class="ti"><div class="ti-l">PREV LOW</div><div class="ti-v or" id="t-pl">--</div></div>
   </div>
   <div class="tb-right">
     <span class="pill pill-c" id="bestPill">NO SIGNAL</span>
+    <button class="btn-icon" onclick="showWeekModal()" style="font-size:9px" title="Last 5 days OHLC">📅 WEEK</button>
     <button class="btn-icon" onclick="toggleTheme()" id="themeBtn">◐ LIGHT</button>
     <button class="btn-icon" onclick="showGuide()" style="background:rgba(0,204,245,0.08);border-color:var(--cyan);color:var(--cyan)">? GUIDE</button>
     <span class="pill pill-g" id="mktPill">--</span>
   </div>
 </div>
 
+<!-- Mobile overlay -->
+<div class="mob-overlay" id="mobOverlay" onclick="toggleSidebar()"></div>
+
 <!-- ═══════ WORKSPACE ═══════ -->
 <div class="workspace">
 
 <!-- ── LEFT SIDEBAR ── -->
 <div class="sidebar">
-  <div style="padding:8px 10px;border-bottom:1px solid var(--b1)">
+  <div style="padding:8px 10px;border-bottom:1px solid var(--b1);display:flex;flex-direction:column;gap:6px">
     <button class="btn-scan" id="scanBtn" onclick="runScan()">▶ SCAN STRATEGIES</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+      <button class="btn-scan" onclick="showSRModal()" style="font-size:8px;letter-spacing:1.5px;background:rgba(255,200,50,0.05);border-color:var(--yellow);color:var(--yellow);padding:7px">
+        📊 S/R LEVELS
+      </button>
+      <button class="btn-scan" onclick="showSRAnalysis()" style="font-size:8px;letter-spacing:1.5px;background:rgba(0,232,122,0.05);border-color:var(--green);color:var(--green);padding:7px">
+        🎯 SR ANALYSIS
+      </button>
+    </div>
   </div>
   <div class="sb-scroll">
 
@@ -1497,6 +1566,14 @@ function drawChart(){
     drawEMA(e2v, cssVar('--blue'),   1.8);
   }
 
+  // ── LIVE S/R LINES on chart ────────
+  if(G.lay.lvl && G._srForChart && G._srForChart.length){
+    drawChartSR(ctx, xOf, yOf, cW, cH, PAD);
+  }
+
+  // ── LIQUIDITY SWEEP MARKERS ─────────
+  drawLiquiditySweeps(ctx, vis, vs, xOf, yOf, cH, cW, barW, PAD);
+
   // ── CROSSHAIR ──────────────────────
   if(G.hoverIdx >= 0 && G.hoverIdx < barCount){
     const hx = xOf(G.hoverIdx), hy = yOf(vis[G.hoverIdx].c);
@@ -1831,6 +1908,11 @@ async function runScan(){
     const cel=document.getElementById('t-chg');
     cel.textContent=(chg>=0?'+':'')+chg.toFixed(2)+' ('+chgP+'%)';
     cel.className='ti-v '+(chg>=0?'up':'dn');
+    // Day close (same as LTP for intraday, or today's close for daily data)
+    const dcEl=document.getElementById('t-dc');
+    if(dcEl){ dcEl.textContent='₹'+last.c.toFixed(2); dcEl.className='ti-v '+(last.c>=candles[n-2].o?'up':'dn'); }
+    // Fetch SR data in background
+    fetchSRData(sym);
 
     // right panel
     document.getElementById('r-e1').textContent=e1.toFixed(2);
@@ -2102,6 +2184,648 @@ function checkMkt(){
 
 checkMkt(); setInterval(checkMkt,30000);
 window.addEventListener('load',()=>{ drawChart(); runScan(); });
+
+// ═══════════════════════════════════════════════════════
+// SUPPORT & RESISTANCE CALCULATION
+// ═══════════════════════════════════════════════════════
+
+// Store multi-timeframe data
+G.dailyCandles = [];
+G.weeklyCandles = [];
+G.monthlyCandles = [];
+G.srLevels = {daily:[], weekly:[], monthly:[]};
+G.weekData = []; // last 5 days OHLCV
+
+// Fetch daily data for S/R calculations
+async function fetchSRData(sym){
+  const yfSym = YF_SYM[sym] || '^NSEI';
+  const proxy = url => 'https://corsproxy.io/?'+encodeURIComponent(url);
+  
+  try {
+    // Daily - 3 months
+    const dayUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yfSym)}?interval=1d&range=3mo`;
+    const dayResp = await fetch(proxy(dayUrl), {headers:{'Accept':'application/json'}});
+    const dayJ = await dayResp.json();
+    const dayRes = dayJ.chart.result[0];
+    const dayTS = dayRes.timestamp, dayQ = dayRes.indicators.quote[0];
+    const daily = [];
+    for(let i=0;i<dayTS.length;i++){
+      if(!dayQ.open[i]||!dayQ.close[i]) continue;
+      daily.push({t:dayTS[i]*1000,o:+dayQ.open[i].toFixed(2),h:+dayQ.high[i].toFixed(2),l:+dayQ.low[i].toFixed(2),c:+dayQ.close[i].toFixed(2),v:dayQ.volume[i]||0});
+    }
+    G.dailyCandles = daily;
+    G.weekData = daily.slice(-7); // last 7 trading days
+    
+    // Weekly - 6 months
+    const wkUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yfSym)}?interval=1wk&range=6mo`;
+    const wkResp = await fetch(proxy(wkUrl), {headers:{'Accept':'application/json'}});
+    const wkJ = await wkResp.json();
+    const wkRes = wkJ.chart.result[0];
+    const wkTS = wkRes.timestamp, wkQ = wkRes.indicators.quote[0];
+    const weekly = [];
+    for(let i=0;i<wkTS.length;i++){
+      if(!wkQ.open[i]||!wkQ.close[i]) continue;
+      weekly.push({t:wkTS[i]*1000,o:+wkQ.open[i].toFixed(2),h:+wkQ.high[i].toFixed(2),l:+wkQ.low[i].toFixed(2),c:+wkQ.close[i].toFixed(2),v:wkQ.volume[i]||0});
+    }
+    G.weeklyCandles = weekly;
+    
+    // Monthly - 1 year
+    const moUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yfSym)}?interval=1mo&range=1y`;
+    const moResp = await fetch(proxy(moUrl), {headers:{'Accept':'application/json'}});
+    const moJ = await moResp.json();
+    const moRes = moJ.chart.result[0];
+    const moTS = moRes.timestamp, moQ = moRes.indicators.quote[0];
+    const monthly = [];
+    for(let i=0;i<moTS.length;i++){
+      if(!moQ.open[i]||!moQ.close[i]) continue;
+      monthly.push({t:moTS[i]*1000,o:+moQ.open[i].toFixed(2),h:+moQ.high[i].toFixed(2),l:+moQ.low[i].toFixed(2),c:+moQ.close[i].toFixed(2),v:moQ.volume[i]||0});
+    }
+    G.monthlyCandles = monthly;
+    
+    log(`S/R data: ${daily.length} daily, ${weekly.length} weekly, ${monthly.length} monthly`,'i');
+    calcSRLevels();
+    return true;
+  } catch(e) {
+    log('S/R fetch error: '+e.message+' — using candle data','w');
+    // Fallback: use existing candle data
+    G.dailyCandles = G.candles.slice(-90);
+    G.weekData = G.candles.slice(-7);
+    calcSRLevels();
+    return false;
+  }
+}
+
+// Calculate S/R levels from swing highs/lows + pivot points
+function calcSRLevels(){
+  function getSwings(candles, n=3){
+    const highs=[], lows=[];
+    for(let i=n;i<candles.length-n;i++){
+      const isHi = candles.slice(i-n,i).every(c=>c.h<=candles[i].h) &&
+                   candles.slice(i+1,i+n+1).every(c=>c.h<=candles[i].h);
+      const isLo = candles.slice(i-n,i).every(c=>c.l>=candles[i].l) &&
+                   candles.slice(i+1,i+n+1).every(c=>c.l>=candles[i].l);
+      if(isHi) highs.push({price:candles[i].h, idx:i, t:candles[i].t, type:'R'});
+      if(isLo) lows.push({price:candles[i].l, idx:i, t:candles[i].t, type:'S'});
+    }
+    return [...highs,...lows].sort((a,b)=>b.price-a.price);
+  }
+  
+  function getPivots(candles){
+    const levels = [];
+    const today = candles.slice(-2);
+    if(today.length<1) return levels;
+    const pv = today[0]; // previous bar as pivot
+    const pp = (pv.h+pv.l+pv.c)/3;
+    const r1 = 2*pp-pv.l, r2 = pp+(pv.h-pv.l), r3 = pv.h+2*(pp-pv.l);
+    const s1 = 2*pp-pv.h, s2 = pp-(pv.h-pv.l), s3 = pv.l-2*(pv.h-pp);
+    return [
+      {price:+r3.toFixed(2),type:'R',label:'R3',strength:1},
+      {price:+r2.toFixed(2),type:'R',label:'R2',strength:2},
+      {price:+r1.toFixed(2),type:'R',label:'R1',strength:3},
+      {price:+pp.toFixed(2),type:'P',label:'PP',strength:3},
+      {price:+s1.toFixed(2),type:'S',label:'S1',strength:3},
+      {price:+s2.toFixed(2),type:'S',label:'S2',strength:2},
+      {price:+s3.toFixed(2),type:'S',label:'S3',strength:1},
+    ];
+  }
+  
+  // Cluster nearby levels (within 0.2% = same level)
+  function cluster(levels, pct=0.002){
+    const sorted = [...levels].sort((a,b)=>a.price-b.price);
+    const clusters = [];
+    for(const lv of sorted){
+      const existing = clusters.find(cl=>Math.abs(cl.price-lv.price)/lv.price<pct);
+      if(existing){ existing.count++; existing.strength=Math.max(existing.strength||1,(lv.strength||1)); }
+      else clusters.push({...lv,count:1,strength:lv.strength||1});
+    }
+    return clusters.sort((a,b)=>b.price-a.price);
+  }
+  
+  const dSwings = getSwings(G.dailyCandles,2);
+  const dPivots = getPivots(G.dailyCandles);
+  G.srLevels.daily = cluster([...dSwings,...dPivots]);
+  
+  const wSwings = getSwings(G.weeklyCandles,2);
+  const wPivots = getPivots(G.weeklyCandles);
+  G.srLevels.weekly = cluster([...wSwings,...wPivots]);
+  
+  const mSwings = getSwings(G.monthlyCandles,1);
+  const mPivots = getPivots(G.monthlyCandles);
+  G.srLevels.monthly = cluster([...mSwings,...mPivots]);
+  
+  log(`S/R: ${G.srLevels.daily.length}D / ${G.srLevels.weekly.length}W / ${G.srLevels.monthly.length}M levels`,'i');
+  
+  // Inject S/R lines into chart (store for drawChart)
+  G._srForChart = buildChartSR();
+  if(G.candles.length) drawChart();
+}
+
+// Build consolidated S/R for chart overlay (nearby price to current)
+function buildChartSR(){
+  if(!G.candles.length) return [];
+  const last = G.candles[G.candles.length-1].c;
+  const range = last * 0.05; // 5% around current price
+  const all = [];
+  (G.srLevels.daily||[]).forEach(lv=>all.push({...lv,tf:'D',color:'rgba(255,200,50,0.8)'}));
+  (G.srLevels.weekly||[]).forEach(lv=>all.push({...lv,tf:'W',color:'rgba(0,204,245,0.8)'}));
+  (G.srLevels.monthly||[]).forEach(lv=>all.push({...lv,tf:'M',color:'rgba(159,122,234,0.8)'}));
+  // Only show levels within 5% of current price
+  return all.filter(lv=>Math.abs(lv.price-last)<range).sort((a,b)=>b.price-a.price);
+}
+
+// ══════ S/R MODAL ══════
+async function showSRModal(){
+  const m = document.getElementById('srModal');
+  m.style.display = 'flex';
+  document.getElementById('srContent').innerHTML = '<div style="text-align:center;padding:40px;color:var(--t3)">⏳ Loading S/R data...</div>';
+  if(!G.dailyCandles.length || G.dailyCandles.length < 5){
+    await fetchSRData(G.sym);
+  }
+  renderSRModal();
+}
+
+function closeSRModal(){ document.getElementById('srModal').style.display='none'; }
+
+function renderSRModal(){
+  const lv = G.candles.length ? G.candles[G.candles.length-1].c : 0;
+  
+  function srTable(levels, tfLabel, color){
+    if(!levels||!levels.length) return '<div style="color:var(--t3);text-align:center;padding:12px">No data</div>';
+    return `<table style="width:100%;border-collapse:collapse;font-size:10px">
+      <thead><tr style="background:var(--p2)">
+        <th style="padding:6px 8px;text-align:left;color:var(--t3);font-size:8px;letter-spacing:1px">TYPE</th>
+        <th style="padding:6px 8px;text-align:right;color:var(--t3)">PRICE</th>
+        <th style="padding:6px 8px;text-align:right;color:var(--t3)">DIST%</th>
+        <th style="padding:6px 8px;text-align:right;color:var(--t3)">STRENGTH</th>
+      </tr></thead>
+      <tbody>${levels.map(lv2=>{
+        const dist = lv ? ((lv2.price-lv)/lv*100).toFixed(2) : '--';
+        const isAbove = lv2.price > lv;
+        const typeColor = lv2.type==='R'||lv2.type==='R'?'#ff2d55':lv2.type==='S'?'#00e87a':'var(--cyan)';
+        const str = '●'.repeat(Math.min(lv2.strength||1,3))+'○'.repeat(Math.max(0,3-(lv2.strength||1)));
+        return `<tr style="border-bottom:1px solid var(--b1)">
+          <td style="padding:5px 8px;color:${typeColor};font-weight:700">${lv2.label||lv2.type}</td>
+          <td style="padding:5px 8px;text-align:right;color:var(--t1);font-weight:600">${lv2.price.toFixed(2)}</td>
+          <td style="padding:5px 8px;text-align:right;color:${isAbove?'var(--red)':'var(--green)'}">${isAbove?'+':''}${dist}%</td>
+          <td style="padding:5px 8px;text-align:right;color:${color};font-size:9px">${str}</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>`;
+  }
+  
+  document.getElementById('srContent').innerHTML = `
+    <div style="display:flex;gap:14px;flex-wrap:wrap">
+      <!-- Daily -->
+      <div style="flex:1;min-width:220px">
+        <div style="font-size:10px;font-weight:700;color:var(--yellow);letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--yellow);display:inline-block"></span>DAILY S/R
+        </div>
+        <div style="border:1px solid var(--b1);border-radius:5px;overflow:hidden">
+          ${srTable(G.srLevels.daily,'D','var(--yellow)')}
+        </div>
+      </div>
+      <!-- Weekly -->
+      <div style="flex:1;min-width:220px">
+        <div style="font-size:10px;font-weight:700;color:var(--cyan);letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--cyan);display:inline-block"></span>WEEKLY S/R
+        </div>
+        <div style="border:1px solid var(--b1);border-radius:5px;overflow:hidden">
+          ${srTable(G.srLevels.weekly,'W','var(--cyan)')}
+        </div>
+      </div>
+      <!-- Monthly -->
+      <div style="flex:1;min-width:220px">
+        <div style="font-size:10px;font-weight:700;color:var(--purple);letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--purple);display:inline-block"></span>MONTHLY S/R
+        </div>
+        <div style="border:1px solid var(--b1);border-radius:5px;overflow:hidden">
+          ${srTable(G.srLevels.monthly,'M','var(--purple)')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ══════ SR ANALYSIS MODAL (Entry/Exit/SL based on all S/R) ══════
+async function showSRAnalysis(){
+  const m = document.getElementById('srAnalysisModal');
+  m.style.display = 'flex';
+  document.getElementById('srAnalysisContent').innerHTML = '<div style="text-align:center;padding:40px;color:var(--t3)">⏳ Analysing support/resistance...</div>';
+  if(!G.dailyCandles.length||G.dailyCandles.length<5){
+    await fetchSRData(G.sym);
+  }
+  renderSRAnalysis();
+}
+
+function closeSRAnalysis(){ document.getElementById('srAnalysisModal').style.display='none'; }
+
+function renderSRAnalysis(){
+  if(!G.candles.length){ document.getElementById('srAnalysisContent').innerHTML='<div style="text-align:center;padding:40px;color:var(--t3)">Run scan first</div>'; return; }
+  const last = G.candles[G.candles.length-1].c;
+  const n = G.candles.length;
+  const e1 = G.ema1[n-1], e2 = G.ema2[n-1];
+  const trend = e1>e2?'BULLISH':'BEARISH';
+  const tColor = trend==='BULLISH'?'var(--green)':'var(--red)';
+  
+  // Gather all levels, sort by price
+  const allLevels = [];
+  (G.srLevels.daily||[]).forEach(lv=>allLevels.push({...lv,tf:'Daily',tfColor:'var(--yellow)'}));
+  (G.srLevels.weekly||[]).forEach(lv=>allLevels.push({...lv,tf:'Weekly',tfColor:'var(--cyan)'}));
+  (G.srLevels.monthly||[]).forEach(lv=>allLevels.push({...lv,tf:'Monthly',tfColor:'var(--purple)'}));
+  allLevels.sort((a,b)=>a.price-b.price);
+  
+  // Find nearest resistance (above) and support (below)
+  const supports = allLevels.filter(lv=>lv.price<last).sort((a,b)=>b.price-a.price);
+  const resistances = allLevels.filter(lv=>lv.price>last).sort((a,b)=>a.price-b.price);
+  
+  const nearS1 = supports[0], nearS2 = supports[1];
+  const nearR1 = resistances[0], nearR2 = resistances[1];
+  
+  // Strong levels (multi-TF confluence)
+  const strongS = allLevels.filter(lv=>lv.price<last&&(lv.count>=2||lv.strength>=3)).sort((a,b)=>b.price-a.price)[0];
+  const strongR = allLevels.filter(lv=>lv.price>last&&(lv.count>=2||lv.strength>=3)).sort((a,b)=>a.price-b.price)[0];
+  
+  // ATR
+  const atr = G.candles.slice(-14).reduce((s,c)=>s+(c.h-c.l),0)/14;
+  
+  // Compute trade setups
+  const longEntry = nearS1 ? nearS1.price + atr*0.2 : last;
+  const longSL = nearS2 ? nearS2.price - atr*0.3 : last - atr*2;
+  const longRisk = longEntry - longSL;
+  const longT1 = nearR1 ? nearR1.price - atr*0.1 : longEntry + longRisk*2;
+  const longT2 = nearR2 ? nearR2.price - atr*0.1 : longEntry + longRisk*3;
+  
+  const shortEntry = nearR1 ? nearR1.price - atr*0.2 : last;
+  const shortSL = nearR2 ? nearR2.price + atr*0.3 : last + atr*2;
+  const shortRisk = shortSL - shortEntry;
+  const shortT1 = nearS1 ? nearS1.price + atr*0.1 : shortEntry - shortRisk*2;
+  const shortT2 = nearS2 ? nearS2.price + atr*0.1 : shortEntry - shortRisk*3;
+  
+  const bestDir = trend==='BULLISH'?'LONG':'SHORT';
+  
+  document.getElementById('srAnalysisContent').innerHTML = `
+    <!-- Market Context -->
+    <div style="background:var(--p2);border:1px solid var(--b1);border-radius:6px;padding:12px 14px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-size:9px;color:var(--t3);letter-spacing:1px">CURRENT PRICE</div>
+          <div style="font-size:22px;font-weight:700;color:var(--cyan);font-family:Syne,sans-serif">₹${last.toFixed(2)}</div>
+        </div>
+        <div>
+          <div style="font-size:9px;color:var(--t3);letter-spacing:1px">EMA TREND</div>
+          <div style="font-size:18px;font-weight:700;color:${tColor}">${trend}</div>
+        </div>
+        <div>
+          <div style="font-size:9px;color:var(--t3);letter-spacing:1px">ATR (14)</div>
+          <div style="font-size:16px;font-weight:700;color:var(--t1)">${atr.toFixed(1)}</div>
+        </div>
+        <div>
+          <div style="font-size:9px;color:var(--t3);letter-spacing:1px">BIAS</div>
+          <div style="font-size:16px;font-weight:700;color:${tColor}">PREFER ${bestDir}</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Key S/R Near Price -->
+    <div style="background:var(--p2);border:1px solid var(--b1);border-radius:6px;padding:12px 14px;margin-bottom:16px">
+      <div style="font-size:10px;font-weight:700;color:var(--t1);letter-spacing:1px;margin-bottom:10px">📍 KEY LEVELS NEAR PRICE</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        ${nearR2?`<div style="display:flex;justify-content:space-between;padding:6px 8px;background:rgba(255,45,85,0.07);border:1px solid rgba(255,45,85,0.2);border-radius:3px">
+          <span><b style="color:var(--red)">R2</b> <span style="font-size:8px;color:var(--t3)">${nearR2.tf}</span></span>
+          <span style="color:var(--t1);font-weight:600">${nearR2.price.toFixed(2)} <span style="color:var(--red);font-size:9px">(+${((nearR2.price-last)/last*100).toFixed(2)}%)</span></span>
+        </div>`:''}
+        ${nearR1?`<div style="display:flex;justify-content:space-between;padding:6px 8px;background:rgba(255,45,85,0.10);border:1px solid rgba(255,45,85,0.3);border-radius:3px">
+          <span><b style="color:var(--red)">R1</b> <span style="font-size:8px;color:var(--t3)">${nearR1.tf}</span></span>
+          <span style="color:var(--t1);font-weight:600">${nearR1.price.toFixed(2)} <span style="color:var(--red);font-size:9px">(+${((nearR1.price-last)/last*100).toFixed(2)}%)</span></span>
+        </div>`:''}
+        <div style="display:flex;justify-content:space-between;padding:6px 8px;background:rgba(0,204,245,0.10);border:1.5px solid var(--cyan);border-radius:3px">
+          <span><b style="color:var(--cyan)">▶ PRICE</b></span>
+          <span style="color:var(--cyan);font-weight:700;font-size:14px">₹${last.toFixed(2)}</span>
+        </div>
+        ${nearS1?`<div style="display:flex;justify-content:space-between;padding:6px 8px;background:rgba(0,232,122,0.10);border:1px solid rgba(0,232,122,0.3);border-radius:3px">
+          <span><b style="color:var(--green)">S1</b> <span style="font-size:8px;color:var(--t3)">${nearS1.tf}</span></span>
+          <span style="color:var(--t1);font-weight:600">${nearS1.price.toFixed(2)} <span style="color:var(--green);font-size:9px">(${((nearS1.price-last)/last*100).toFixed(2)}%)</span></span>
+        </div>`:''}
+        ${nearS2?`<div style="display:flex;justify-content:space-between;padding:6px 8px;background:rgba(0,232,122,0.07);border:1px solid rgba(0,232,122,0.2);border-radius:3px">
+          <span><b style="color:var(--green)">S2</b> <span style="font-size:8px;color:var(--t3)">${nearS2.tf}</span></span>
+          <span style="color:var(--t1);font-weight:600">${nearS2.price.toFixed(2)} <span style="color:var(--green);font-size:9px">(${((nearS2.price-last)/last*100).toFixed(2)}%)</span></span>
+        </div>`:''}
+      </div>
+    </div>
+    
+    <!-- Trade Setups -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <!-- LONG Setup -->
+      <div style="background:rgba(0,232,122,0.04);border:1px solid rgba(0,232,122,0.25);border-radius:6px;padding:12px;${trend==='BULLISH'?'border-width:2px;background:rgba(0,232,122,0.08)':'opacity:0.7'}">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:13px;font-weight:800;color:var(--green);font-family:Syne,sans-serif">▲ LONG</div>
+          ${trend==='BULLISH'?'<span style="font-size:7px;padding:2px 6px;background:rgba(0,232,122,0.15);border:1px solid rgba(0,232,122,0.3);border-radius:10px;color:var(--green)">PREFERRED</span>':''}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;font-size:10px">
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--b1)">
+            <span style="color:var(--t3)">Entry at S1+buffer</span>
+            <span style="color:var(--cyan);font-weight:700">₹${longEntry.toFixed(2)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--b1)">
+            <span style="color:var(--t3)">Stop Loss (S2)</span>
+            <span style="color:var(--red);font-weight:700">₹${longSL.toFixed(2)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--b1)">
+            <span style="color:var(--t3)">Target 1 (R1)</span>
+            <span style="color:var(--green);font-weight:700">₹${longT1.toFixed(2)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--b1)">
+            <span style="color:var(--t3)">Target 2 (R2)</span>
+            <span style="color:var(--green);font-weight:700">₹${longT2.toFixed(2)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--b1)">
+            <span style="color:var(--t3)">Risk / Trade</span>
+            <span style="color:var(--yellow);font-weight:700">${longRisk.toFixed(1)} pts</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0">
+            <span style="color:var(--t3)">R:R to T1</span>
+            <span style="color:var(--t1);font-weight:700">1:${((longT1-longEntry)/longRisk).toFixed(1)}</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- SHORT Setup -->
+      <div style="background:rgba(255,45,85,0.04);border:1px solid rgba(255,45,85,0.25);border-radius:6px;padding:12px;${trend==='BEARISH'?'border-width:2px;background:rgba(255,45,85,0.08)':'opacity:0.7'}">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:13px;font-weight:800;color:var(--red);font-family:Syne,sans-serif">▼ SHORT</div>
+          ${trend==='BEARISH'?'<span style="font-size:7px;padding:2px 6px;background:rgba(255,45,85,0.15);border:1px solid rgba(255,45,85,0.3);border-radius:10px;color:var(--red)">PREFERRED</span>':''}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;font-size:10px">
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--b1)">
+            <span style="color:var(--t3)">Entry at R1-buffer</span>
+            <span style="color:var(--cyan);font-weight:700">₹${shortEntry.toFixed(2)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--b1)">
+            <span style="color:var(--t3)">Stop Loss (R2)</span>
+            <span style="color:var(--red);font-weight:700">₹${shortSL.toFixed(2)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--b1)">
+            <span style="color:var(--t3)">Target 1 (S1)</span>
+            <span style="color:var(--green);font-weight:700">₹${shortT1.toFixed(2)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--b1)">
+            <span style="color:var(--t3)">Target 2 (S2)</span>
+            <span style="color:var(--green);font-weight:700">₹${shortT2.toFixed(2)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--b1)">
+            <span style="color:var(--t3)">Risk / Trade</span>
+            <span style="color:var(--yellow);font-weight:700">${shortRisk.toFixed(1)} pts</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0">
+            <span style="color:var(--t3)">R:R to T1</span>
+            <span style="color:var(--t1);font-weight:700">1:${((shortEntry-shortT1)/shortRisk).toFixed(1)}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Confluence S/R (multi-TF) -->
+    ${(strongS||strongR)?`<div style="background:var(--p2);border:1px solid var(--b1);border-radius:6px;padding:12px 14px;">
+      <div style="font-size:10px;font-weight:700;color:var(--t1);letter-spacing:1px;margin-bottom:8px">⭐ HIGH-CONFLUENCE ZONES (multi-TF agreement)</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${strongR?`<div style="flex:1;min-width:140px;background:rgba(255,45,85,0.08);border:1px solid rgba(255,45,85,0.3);border-radius:4px;padding:8px">
+          <div style="font-size:8px;color:var(--t3)">STRONG RESISTANCE</div>
+          <div style="font-size:16px;font-weight:700;color:var(--red)">${strongR.price.toFixed(2)}</div>
+          <div style="font-size:8px;color:var(--t3)">${strongR.tf} • Count:${strongR.count||1}</div>
+        </div>`:''}
+        ${strongS?`<div style="flex:1;min-width:140px;background:rgba(0,232,122,0.08);border:1px solid rgba(0,232,122,0.3);border-radius:4px;padding:8px">
+          <div style="font-size:8px;color:var(--t3)">STRONG SUPPORT</div>
+          <div style="font-size:16px;font-weight:700;color:var(--green)">${strongS.price.toFixed(2)}</div>
+          <div style="font-size:8px;color:var(--t3)">${strongS.tf} • Count:${strongS.count||1}</div>
+        </div>`:''}
+      </div>
+    </div>`:''}
+  `;
+}
+
+// ══════ WEEK DATA MODAL ══════
+async function showWeekModal(){
+  const m = document.getElementById('weekModal');
+  m.style.display = 'flex';
+  document.getElementById('weekContent').innerHTML = '<div style="text-align:center;padding:40px;color:var(--t3)">⏳ Loading week data...</div>';
+  if(!G.dailyCandles.length){
+    await fetchSRData(G.sym);
+  }
+  renderWeekModal();
+}
+
+function closeWeekModal(){ document.getElementById('weekModal').style.display='none'; }
+
+function renderWeekModal(){
+  const days = G.weekData.slice(-7);
+  if(!days.length){
+    document.getElementById('weekContent').innerHTML='<div style="text-align:center;padding:40px;color:var(--t3)">No data. Run scan first.</div>';
+    return;
+  }
+  const last = G.candles.length ? G.candles[G.candles.length-1].c : 0;
+  document.getElementById('weekContent').innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:11px">
+      <thead><tr style="background:var(--p2)">
+        <th style="padding:8px 10px;text-align:left;color:var(--t3);font-size:8px;letter-spacing:1.5px">DATE</th>
+        <th style="padding:8px 10px;text-align:right;color:var(--t3)">OPEN</th>
+        <th style="padding:8px 10px;text-align:right;color:var(--green)">HIGH</th>
+        <th style="padding:8px 10px;text-align:right;color:var(--red)">LOW</th>
+        <th style="padding:8px 10px;text-align:right;color:var(--t3)">CLOSE</th>
+        <th style="padding:8px 10px;text-align:right;color:var(--t3)">CHANGE</th>
+        <th style="padding:8px 10px;text-align:right;color:var(--t3)">RANGE</th>
+      </tr></thead>
+      <tbody>
+        ${days.map((d,i)=>{
+          const date = new Date(d.t).toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short'});
+          const chg = d.c-d.o, chgP=(chg/d.o*100).toFixed(2);
+          const bull = d.c>=d.o;
+          const range = (d.h-d.l).toFixed(2);
+          const isToday = i===days.length-1;
+          return `<tr style="border-bottom:1px solid var(--b1);${isToday?'background:var(--p2)':''}">
+            <td style="padding:7px 10px;color:var(--t2);font-weight:${isToday?700:400}">${date}${isToday?' ◀':''}</td>
+            <td style="padding:7px 10px;text-align:right;color:var(--orange)">${d.o.toFixed(2)}</td>
+            <td style="padding:7px 10px;text-align:right;color:var(--green);font-weight:600">${d.h.toFixed(2)}</td>
+            <td style="padding:7px 10px;text-align:right;color:var(--red);font-weight:600">${d.l.toFixed(2)}</td>
+            <td style="padding:7px 10px;text-align:right;color:var(--t1);font-weight:600">${d.c.toFixed(2)}</td>
+            <td style="padding:7px 10px;text-align:right;color:${bull?'var(--green)':'var(--red)'};font-weight:600">${bull?'+':''}${chg.toFixed(2)} (${chgP}%)</td>
+            <td style="padding:7px 10px;text-align:right;color:var(--yellow)">${range}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+    <!-- Summary stats -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:12px;background:var(--p2);border-top:1px solid var(--b1)">
+      ${[
+        ['5D High',Math.max(...days.map(d=>d.h)).toFixed(2),'var(--green)'],
+        ['5D Low',Math.min(...days.map(d=>d.l)).toFixed(2),'var(--red)'],
+        ['5D Range',(Math.max(...days.map(d=>d.h))-Math.min(...days.map(d=>d.l))).toFixed(2),'var(--yellow)'],
+        ['Avg Range',(days.reduce((a,d)=>a+(d.h-d.l),0)/days.length).toFixed(1),'var(--cyan)'],
+      ].map(([l,v,c])=>`<div style="text-align:center;padding:6px"><div style="font-size:7px;color:var(--t3);letter-spacing:1px">${l}</div><div style="font-size:14px;font-weight:700;color:${c}">${v}</div></div>`).join('')}
+    </div>
+  `;
+}
+
+// ══════ LIQUIDITY SWEEP CHART DRAWING ══════
+// Draw sweep markers on chart (called from drawChart)
+function drawLiquiditySweeps(ctx, vis, vs, xOf, yOf, cH, cW, barW, PAD){
+  const n = G.candles.length;
+  if(n < 20) return;
+  
+  // Find all sweep events in visible range
+  for(let vi=1;vi<vis.length-1;vi++){
+    const absI = vs + vi;
+    if(absI < 20 || absI >= n-1) continue;
+    const pv = G.candles[absI-1], cur = G.candles[absI], nx = G.candles[absI+1];
+    const lb20 = G.candles.slice(Math.max(0,absI-20),absI-2);
+    if(!lb20.length) continue;
+    const swingHi = Math.max(...lb20.map(c=>c.h));
+    const swingLo = Math.min(...lb20.map(c=>c.l));
+    const atr = G.candles.slice(Math.max(0,absI-14),absI).reduce((s,c)=>s+(c.h-c.l),0)/14;
+    
+    const x = xOf(vi);
+    
+    // Bull sweep: wick below swing low then closed above
+    const bullSweep = cur.l < swingLo && cur.c > swingLo && (swingLo-cur.l) < atr*0.8;
+    // Bear sweep: wick above swing high then closed below
+    const bearSweep = cur.h > swingHi && cur.c < swingHi && (cur.h-swingHi) < atr*0.8;
+    
+    if(bullSweep){
+      // Draw lightning bolt / arrow at the sweep low
+      const y = yOf(cur.l);
+      ctx.save();
+      ctx.fillStyle = '#00e87a';
+      ctx.strokeStyle = '#00e87a';
+      ctx.lineWidth = 1.5;
+      // Arrow up
+      ctx.beginPath();
+      ctx.moveTo(x, y+14);
+      ctx.lineTo(x, y+4);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x-4,y+8); ctx.lineTo(x,y+3); ctx.lineTo(x+4,y+8);
+      ctx.fillStyle='#00e87a'; ctx.fill();
+      // Label
+      ctx.font = "bold 8px 'JetBrains Mono',monospace";
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#00e87a';
+      ctx.fillText('💧', x, y+26);
+      ctx.restore();
+    }
+    if(bearSweep){
+      const y = yOf(cur.h);
+      ctx.save();
+      ctx.strokeStyle = '#ff2d55';
+      ctx.lineWidth = 1.5;
+      // Arrow down
+      ctx.beginPath();
+      ctx.moveTo(x, y-14);
+      ctx.lineTo(x, y-4);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x-4,y-8); ctx.lineTo(x,y-3); ctx.lineTo(x+4,y-8);
+      ctx.fillStyle='#ff2d55'; ctx.fill();
+      ctx.font = "bold 8px 'JetBrains Mono',monospace";
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#ff2d55';
+      ctx.fillText('💧', x, y-26);
+      ctx.restore();
+    }
+  }
+}
+
+// ══════ LIVE CHART S/R LINES ══════
+// Drawn inside drawChart after clipping
+function drawChartSR(ctx, xOf, yOf, cW, cH, PAD){
+  const srLines = G._srForChart || [];
+  if(!srLines.length) return;
+  srLines.forEach(lv=>{
+    const y = yOf(lv.price);
+    if(y < PAD.t - 2 || y > PAD.t + cH + 2) return;
+    ctx.save();
+    ctx.strokeStyle = lv.color;
+    ctx.lineWidth = lv.type==='P' ? 1.5 : 1;
+    ctx.setLineDash(lv.tf==='M'?[8,4]:lv.tf==='W'?[5,3]:[3,2]);
+    ctx.beginPath();
+    ctx.moveTo(PAD.l, y); ctx.lineTo(PAD.l + cW, y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // Label on left edge
+    ctx.globalAlpha = 0.9;
+    ctx.fillStyle = lv.color;
+    ctx.font = "bold 7px 'JetBrains Mono',monospace";
+    ctx.textAlign = 'left';
+    const lbl = (lv.label||lv.type)+'·'+lv.tf;
+    ctx.fillText(lbl, PAD.l + 4, y - 2);
+    ctx.restore();
+  });
+}
+
+</script>
+
+
+<!-- ══════ S/R LEVELS MODAL ══════ -->
+<div id="srModal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);overflow-y:auto;align-items:flex-start;justify-content:center;padding:16px">
+  <div style="width:100%;max-width:900px;margin:0 auto;background:var(--p1);border:1px solid var(--b2);border-radius:10px;overflow:hidden;box-shadow:0 16px 60px rgba(0,0,0,0.5)">
+    <div style="background:var(--p2);padding:14px 20px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-family:Syne,sans-serif;font-size:17px;font-weight:800;color:var(--t1)">📊 SUPPORT & RESISTANCE — Daily / Weekly / Monthly</div>
+        <div style="font-size:8px;color:var(--t3);letter-spacing:2px;margin-top:2px">Swing highs/lows + Pivot Points — last 3 months</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button onclick="fetchSRData(G.sym).then(renderSRModal)" style="background:var(--p3);border:1px solid var(--b2);color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:9px;padding:5px 10px;border-radius:3px;cursor:pointer">↻ REFRESH</button>
+        <button onclick="closeSRModal()" style="background:var(--red);border:none;color:#fff;font-size:14px;width:28px;height:28px;border-radius:50%;cursor:pointer;font-weight:700">✕</button>
+      </div>
+    </div>
+    <div id="srContent" style="padding:16px;overflow-y:auto;max-height:80vh">
+      <div style="text-align:center;padding:40px;color:var(--t3)">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ SR ANALYSIS MODAL ══════ -->
+<div id="srAnalysisModal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);overflow-y:auto;align-items:flex-start;justify-content:center;padding:16px">
+  <div style="width:100%;max-width:700px;margin:0 auto;background:var(--p1);border:1px solid var(--b2);border-radius:10px;overflow:hidden;box-shadow:0 16px 60px rgba(0,0,0,0.5)">
+    <div style="background:var(--p2);padding:14px 20px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-family:Syne,sans-serif;font-size:17px;font-weight:800;color:var(--t1)">🎯 S/R TRADE ANALYSIS</div>
+        <div style="font-size:8px;color:var(--t3);letter-spacing:2px;margin-top:2px">Entry / Exit / Stop Loss based on D/W/M support & resistance</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="renderSRAnalysis()" style="background:var(--p3);border:1px solid var(--b2);color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:9px;padding:5px 10px;border-radius:3px;cursor:pointer">↻ REFRESH</button>
+        <button onclick="closeSRAnalysis()" style="background:var(--red);border:none;color:#fff;font-size:14px;width:28px;height:28px;border-radius:50%;cursor:pointer;font-weight:700">✕</button>
+      </div>
+    </div>
+    <div id="srAnalysisContent" style="padding:16px;overflow-y:auto;max-height:80vh">
+      <div style="text-align:center;padding:40px;color:var(--t3)">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ WEEK DATA MODAL ══════ -->
+<div id="weekModal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);overflow-y:auto;align-items:flex-start;justify-content:center;padding:16px">
+  <div style="width:100%;max-width:680px;margin:0 auto;background:var(--p1);border:1px solid var(--b2);border-radius:10px;overflow:hidden;box-shadow:0 16px 60px rgba(0,0,0,0.5)">
+    <div style="background:var(--p2);padding:14px 20px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-family:Syne,sans-serif;font-size:17px;font-weight:800;color:var(--t1)">📅 LAST 7 DAYS — OHLCV</div>
+        <div style="font-size:8px;color:var(--t3);letter-spacing:2px;margin-top:2px">Daily Open · High · Low · Close · Change</div>
+      </div>
+      <button onclick="closeWeekModal()" style="background:var(--red);border:none;color:#fff;font-size:14px;width:28px;height:28px;border-radius:50%;cursor:pointer;font-weight:700">✕</button>
+    </div>
+    <div id="weekContent" style="overflow-y:auto;max-height:80vh">
+      <div style="text-align:center;padding:40px;color:var(--t3)">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Close modals on backdrop click
+['srModal','srAnalysisModal','weekModal'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(e){
+    if(e.target===this) this.style.display='none';
+  });
+});
+// Sidebar ID for mobile
+document.querySelector('.sidebar').id = 'mobSidebar';
 </script>
 
 <!-- LOGO BUTTON bottom-right -->
