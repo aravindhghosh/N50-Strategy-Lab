@@ -381,7 +381,9 @@ select option{background:var(--p2)}
   }
 
   .workspace {
+    display: flex !important;
     flex: 1 1 auto !important;
+    flex-direction: column !important;
     min-height: 0 !important;
     overflow: hidden !important;
   }
@@ -406,8 +408,9 @@ select option{background:var(--p2)}
 
   .center {
     min-height: 0 !important;
-    display: grid !important;
-    grid-template-rows: auto minmax(220px, 44vh) auto minmax(170px, 1fr) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
     overflow: hidden !important;
   }
 
@@ -432,15 +435,18 @@ select option{background:var(--p2)}
   }
 
   .chart-wrap {
-    height: auto !important;
+    position: relative !important;
+    flex: 0 0 auto !important;
+    height: clamp(220px, 44vh, 380px) !important;
     min-height: 220px !important;
-    max-height: none !important;
+    max-height: 380px !important;
+    overflow: hidden !important;
   }
 
   .date-nav {
     display: flex !important;
     align-items: center !important;
-    height: 30px !important;
+    height: 32px !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;
     white-space: nowrap !important;
@@ -463,10 +469,22 @@ select option{background:var(--p2)}
     flex: 1 1 auto !important;
   }
 
+  .chart-legend {
+    max-width: calc(100% - 16px) !important;
+    overflow: hidden !important;
+    gap: 6px !important;
+  }
+
+  .chart-legend .leg-i:nth-child(n+5) {
+    display: none !important;
+  }
+
   .btabs {
+    display: flex !important;
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;
+    flex: 0 0 auto !important;
   }
 
   .btab {
@@ -474,8 +492,16 @@ select option{background:var(--p2)}
   }
 
   .bpanel {
-    height: auto !important;
-    min-height: 170px !important;
+    flex: 1 1 auto !important;
+    min-height: 180px !important;
+    max-height: none !important;
+    overflow: hidden !important;
+  }
+
+  .bpanel > div {
+    height: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
   }
 
   .tt {
@@ -488,12 +514,18 @@ select option{background:var(--p2)}
 }
 
 @media (max-width: 480px) {
-  .center {
-    grid-template-rows: auto minmax(190px, 40vh) auto minmax(150px, 1fr) !important;
+  .chart-wrap {
+    height: clamp(190px, 38vh, 300px) !important;
+    min-height: 190px !important;
+    max-height: 300px !important;
   }
 
   .minimap-wrap {
     min-width: 80px !important;
+  }
+
+  .chart-legend .leg-i:nth-child(n+4) {
+    display: none !important;
   }
 }
 </style>
