@@ -1,7 +1,7 @@
 {
   "name": "n50-strategy-lab-react",
   "private": false,
-  "homepage": "https://aravindhghosh.github.io/N50-Strategy-Lab/",
+  "homepage": ".",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
