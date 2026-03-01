@@ -32,24 +32,24 @@ export default function Topbar({ onShowGuide, onShowWeek }) {
   ];
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', height: 46, flexShrink: 0, background: 'var(--p1)', borderBottom: '1px solid var(--b1)', padding: '0 12px', gap: 0 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingRight: 14, borderRight: '1px solid var(--b1)', flexShrink: 0 }}>
+    <div className="topbar" style={{ display: 'flex', alignItems: 'center', height: 46, flexShrink: 0, background: 'var(--p1)', borderBottom: '1px solid var(--b1)', padding: '0 12px', gap: 0 }}>
+      <div className="topbar-brand" style={{ display: 'flex', alignItems: 'center', gap: 8, paddingRight: 14, borderRight: '1px solid var(--b1)', flexShrink: 0 }}>
         <div style={{ fontFamily: 'Syne, sans-serif', fontSize: 18, fontWeight: 800, color: 'var(--t1)', letterSpacing: 1 }}>
           <span style={{ color: 'var(--cyan)' }}>N50</span> STRATEGY LAB
         </div>
         <div style={{ fontSize: 7, letterSpacing: 2, color: 'var(--t3)', padding: '2px 5px', border: '1px solid var(--b2)', borderRadius: 2 }}>v1</div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', flex: 1, overflow: 'hidden' }}>
+      <div className="topbar-ticker" style={{ display: 'flex', alignItems: 'center', flex: 1, overflow: 'hidden' }}>
         {ticker.map(({ l, v, cls }) => (
-          <div key={l} style={{ display: 'flex', flexDirection: 'column', padding: '0 12px', borderRight: '1px solid var(--b1)', flexShrink: 0 }}>
+          <div key={l} className="topbar-ticker-item" style={{ display: 'flex', flexDirection: 'column', padding: '0 12px', borderRight: '1px solid var(--b1)', flexShrink: 0 }}>
             <div style={{ fontSize: 7, letterSpacing: '1.5px', color: 'var(--t3)', textTransform: 'uppercase', marginBottom: 2 }}>{l}</div>
             <div style={{ fontSize: 12, fontWeight: 600, color: cls === 'cy' ? 'var(--cyan)' : cls === 'up' ? 'var(--green)' : cls === 'dn' ? 'var(--red)' : cls === 'ye' ? 'var(--yellow)' : cls === 'or' ? 'var(--orange)' : 'var(--t1)', whiteSpace: 'nowrap' }}>{v}</div>
           </div>
         ))}
       </div>
 
-      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0, paddingLeft: 10 }}>
+      <div className="topbar-actions" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0, paddingLeft: 10 }}>
         {bestCombo ? (
           <span className={`pill ${bestCombo.dir === 'LONG' ? 'pill-g' : 'pill-r'}`}>{bestCombo.label} {bestCombo.dir}</span>
         ) : (

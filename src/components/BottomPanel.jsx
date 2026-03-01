@@ -80,14 +80,14 @@ export default function BottomPanel() {
   const wr = wins + losses ? ((wins / (wins + losses)) * 100).toFixed(0) : '--';
 
   return (
-    <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
+    <div className="bottom-panel" style={{ flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', background: 'var(--p1)', borderTop: '1px solid var(--b1)', flexShrink: 0 }}>
         {tabs.map(({ id, l }) => (
           <div key={id} onClick={() => setActiveTab(id)} style={{ padding: '7px 13px', fontSize: 7, letterSpacing: '1.5px', color: activeTab === id ? 'var(--cyan)' : 'var(--t3)', cursor: 'pointer', borderBottom: `2px solid ${activeTab === id ? 'var(--cyan)' : 'transparent'}`, transition: 'all .12s', textTransform: 'uppercase' }}>{l}</div>
         ))}
         {trades && <div style={{ marginLeft: 'auto', padding: '7px 11px', fontSize: 8, color: 'var(--t3)' }}>Trades: {trades.length} | W:{wins} L:{losses} | WR:{wr}%</div>}
       </div>
-      <div style={{ height: 200, flexShrink: 0, background: 'var(--p1)', borderTop: '1px solid var(--b1)', overflow: 'hidden' }}>
+      <div className="bottom-panel-body" style={{ height: 200, flexShrink: 0, background: 'var(--p1)', borderTop: '1px solid var(--b1)', overflow: 'hidden' }}>
         <div style={{ height: '100%', overflow: 'auto', display: activeTab === 'th' ? 'block' : 'none' }}>
           <table className="tt"><thead><tr><th>#</th><th>TIME</th><th>STRAT</th><th>DIR</th><th>ENTRY</th><th>SL</th><th>TARGET</th><th>EXIT</th><th>PNL pts</th><th>RR</th><th>STATUS</th><th>REASON</th></tr></thead>
             <tbody><TradeTable trades={trades} /></tbody>

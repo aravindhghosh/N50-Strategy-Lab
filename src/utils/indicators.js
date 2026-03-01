@@ -91,6 +91,84 @@ export function detectFVGs(candles) {
   return fvgs;
 }
 
+export function detectIFVGs(candles) {
+  const ifvgs = [];
+  const n = candles.length;
+
+  for (let i = 1; i < n - 1; i++) {
+    const pv = candles[i - 1];
+    const nx = candles[i + 1];
+
+    // Bear FVG (gap below) -> Bull iFVG when filled and rejected.
+    if (pv.l > nx.h + 0.3) {
+      const gapTop = pv.l;
+      const gapBot = nx.h;
+      for (let j = i + 2; j < n; j++) {
+        const c = candles[j];
+        if (c.h >= gapBot) {
+          if (c.c >= gapBot) {
+            if (j + 1 < n && candles[j + 1].c < gapTop) {
+              ifvgs.push({
+                type: 'bull',
+                top: gapTop,
+                bot: gapBot,
+                idx: i,
+                fillIdx: j,
+                invIdx: j,
+                invalidIdx: null,
+                endIdx: null,
+                active: true,
+                retested: true,
+                origin: 'bearFVG'
+              });
+            }
+          }
+          break;
+        }
+      }
+    }
+
+    // Bull FVG (gap above) -> Bear iFVG when filled and rejected.
+    if (nx.l > pv.h + 0.3) {
+      const gapTop = nx.l;
+      const gapBot = pv.h;
+      for (let j = i + 2; j < n; j++) {
+        const c = candles[j];
+        if (c.l <= gapTop) {
+          if (c.c <= gapTop) {
+            if (j + 1 < n && candles[j + 1].c > gapBot) {
+              ifvgs.push({
+                type: 'bear',
+                top: gapTop,
+                bot: gapBot,
+                idx: i,
+                fillIdx: j,
+                invIdx: j,
+                invalidIdx: null,
+                endIdx: null,
+                active: true,
+                retested: true,
+                origin: 'bullFVG'
+              });
+            }
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  ifvgs.forEach(f => {
+    for (let j = (f.fillIdx ?? f.invIdx ?? f.idx) + 2; j < n; j++) {
+      const c = candles[j];
+      if (f.type === 'bull' && c.c < f.bot) { f.active = false; f.invalidIdx = j; f.endIdx = j; break; }
+      if (f.type === 'bear' && c.c > f.top) { f.active = false; f.invalidIdx = j; f.endIdx = j; break; }
+    }
+  });
+
+  return ifvgs;
+}
+
 export function calcAnchoredVWAP(candles) {
   const n = candles.length;
   const vwap = new Array(n).fill(null);
@@ -200,6 +278,62 @@ export function stratFVG(can, e1, e2, rr) {
   const sl = dir === 'LONG' ? +(best.bot - atr * 0.3).toFixed(2) : +(best.top + atr * 0.3).toFixed(2);
   const risk = Math.abs(L.c - sl);
   return { dir, entry: +L.c.toFixed(2), sl, target: +(dir === 'LONG' ? L.c + risk * rr : L.c - risk * rr).toFixed(2), risk: +risk.toFixed(2), rr, conf: best.conf, reason: `FVG: ${dir === 'LONG' ? 'Bull' : 'Bear'} FVG (${best.bot.toFixed(0)}-${best.top.toFixed(0)})`, strat: 'FVG' };
+}
+
+export function stratIFVG(can, e1, e2, rr) {
+  const n = can.length;
+  if (n < 12) return { dir: 'WAIT', conf: 0, reason: 'Not enough data', strat: 'iFVG' };
+  const ifvgs = detectIFVGs(can);
+  const L = can[n - 1];
+  const atr = calcATR(can, 14);
+  const emaBull = e1[n - 1] > e2[n - 1];
+  let bf = null;
+  let sf = null;
+
+  for (const f of ifvgs.filter(v => v.type === 'bull' && v.active && (v.fillIdx ?? 0) > n - 80).reverse()) {
+    if (L.c >= f.bot - atr && L.c <= f.top + atr) { bf = f; break; }
+  }
+  for (const f of ifvgs.filter(v => v.type === 'bear' && v.active && (v.fillIdx ?? 0) > n - 80).reverse()) {
+    if (L.c >= f.bot - atr && L.c <= f.top + atr) { sf = f; break; }
+  }
+
+  let dir = null;
+  let best = null;
+  let conf = 0;
+  let reason = '';
+  if (bf && !sf) {
+    dir = 'LONG';
+    best = bf;
+    conf = emaBull ? 3 : 2;
+    reason = `iFVG Bull [${best.bot.toFixed(0)}-${best.top.toFixed(0)}] flipped support${emaBull ? ' +EMA' : ''}`;
+  } else if (sf && !bf) {
+    dir = 'SHORT';
+    best = sf;
+    conf = !emaBull ? 3 : 2;
+    reason = `iFVG Bear [${best.bot.toFixed(0)}-${best.top.toFixed(0)}] flipped resistance${!emaBull ? ' +EMA' : ''}`;
+  } else if (bf && sf) {
+    const db = Math.abs(L.c - (bf.bot + bf.top) / 2);
+    const ds = Math.abs(L.c - (sf.bot + sf.top) / 2);
+    if (db < ds) { dir = 'LONG'; best = bf; conf = 1; }
+    else { dir = 'SHORT'; best = sf; conf = 1; }
+    reason = 'Nearest iFVG';
+  }
+
+  if (!dir || !best) return { dir: 'WAIT', conf: 0, reason: 'No iFVG in range', strat: 'iFVG' };
+  const sl = dir === 'LONG' ? +(best.bot - atr * 0.3).toFixed(2) : +(best.top + atr * 0.3).toFixed(2);
+  const risk = Math.abs(L.c - sl);
+  if (risk < 0.1) return { dir: 'WAIT', conf: 0, reason: 'iFVG risk too small', strat: 'iFVG' };
+  return {
+    dir,
+    entry: +L.c.toFixed(2),
+    sl,
+    target: +(dir === 'LONG' ? L.c + risk * rr : L.c - risk * rr).toFixed(2),
+    risk: +risk.toFixed(2),
+    rr,
+    conf,
+    reason,
+    strat: 'iFVG'
+  };
 }
 
 export function stratOF(can, e1, e2, rr) {
@@ -316,6 +450,7 @@ export function scanTrades(candles, ema1, ema2, rr, lookback, stratOn) {
     if (stratOn.ema) { const s = stratEMA(sl, e1, e2, rr); if (s.dir !== 'WAIT') sigs.push(s); }
     if (stratOn.ob) { const s = stratOB(sl, e1, e2, rr); if (s.dir !== 'WAIT') sigs.push(s); }
     if (stratOn.fvg) { const s = stratFVG(sl, e1, e2, rr); if (s.dir !== 'WAIT') sigs.push(s); }
+    if (stratOn.ifvg) { const s = stratIFVG(sl, e1, e2, rr); if (s.dir !== 'WAIT') sigs.push(s); }
     if (stratOn.of) { const s = stratOF(sl, e1, e2, rr); if (s.dir !== 'WAIT') sigs.push(s); }
     if (stratOn.ls) { const s = stratLS(sl, e1, e2, rr); if (s.dir !== 'WAIT') sigs.push(s); }
     if (stratOn.vwap) { const vd = calcAnchoredVWAP(sl); const s = stratVWAP(sl, e1, e2, rr, vd); if (s.dir !== 'WAIT') sigs.push(s); }

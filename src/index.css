@@ -32,7 +32,7 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html, body, #root { height: 100%; background: var(--bg); color: var(--t2); font-family: 'JetBrains Mono', monospace; font-size: 11px; overflow: hidden; }
+html, body, #root { height: 100%; background: var(--bg); color: var(--t2); font-family: 'JetBrains Mono', monospace; font-size: 11px; overflow: hidden; overflow-x: hidden; }
 body, #root { display: flex; flex-direction: column; }
 
 ::-webkit-scrollbar { width: 3px; height: 3px; }
@@ -112,4 +112,276 @@ select option { background:var(--p2); }
 
 @media (max-width:768px) {
   html,body,#root { overflow:auto;height:auto;min-height:100vh; }
+}
+
+@media (max-width:1300px) {
+  html, body, #root {
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .app-root {
+    min-height: 100vh;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .topbar {
+    height: auto !important;
+    min-height: 46px;
+    flex-wrap: wrap;
+    align-items: flex-start !important;
+    row-gap: 6px;
+    padding: 6px 10px !important;
+  }
+
+  .topbar-brand {
+    border-right: none !important;
+    padding-right: 0 !important;
+  }
+
+  .topbar-ticker {
+    order: 3;
+    width: 100%;
+    flex: 1 0 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    min-height: 34px;
+    overflow-x: auto !important;
+    overflow-y: hidden;
+    border-top: 1px solid var(--b1);
+    padding-top: 6px;
+    padding-bottom: 4px;
+    margin-top: 2px;
+  }
+
+  .topbar-ticker-item {
+    min-width: 94px;
+    padding-right: 10px !important;
+  }
+
+  .topbar-ticker-item:last-child {
+    border-right: none !important;
+  }
+
+  .topbar-actions {
+    margin-left: auto !important;
+    padding-left: 0 !important;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px !important;
+  }
+
+  .app-main {
+    flex-direction: column !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    width: 100% !important;
+  }
+
+  .app-center {
+    order: 1;
+    min-height: 58vh;
+    height: 58vh;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+  }
+
+  .chart-wrap,
+  .bottom-panel {
+    width: 100% !important;
+  }
+
+  .sidebar-panel {
+    order: 2;
+    width: 100% !important;
+    max-height: none !important;
+    height: auto !important;
+    border-right: none !important;
+    border-top: 1px solid var(--b1);
+    overflow: visible !important;
+  }
+
+  .right-panel {
+    order: 3;
+    width: 100% !important;
+    max-height: none !important;
+    height: auto !important;
+    border-left: none !important;
+    border-top: 1px solid var(--b1);
+    overflow-y: visible !important;
+  }
+
+  .sidebar-panel > div:last-child {
+    overflow: visible !important;
+    flex: 0 0 auto !important;
+  }
+
+  .chart-toolbar { padding: 6px 8px !important; gap: 4px !important; }
+  .chart-toolbar-row { align-items: center; }
+  .chart-toolbar-row-main { border-bottom: 1px solid var(--b1); padding-bottom: 4px; }
+  .chart-toolbar-row-layers { padding-top: 2px; }
+  .chart-toolbar-row-legend { padding-top: 2px; max-width: 100%; overflow-x: auto; flex-wrap: nowrap !important; }
+  .chart-toolbar-row-main > span,
+  .chart-toolbar-row-layers > span {
+    width: 40px;
+    display: inline-block;
+    flex: 0 0 40px;
+  }
+  .chart-toolbar-row-legend {
+    padding-bottom: 2px;
+  }
+
+  .nav-info {
+    width: 100%;
+    display: block;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tt {
+    min-width: 980px;
+  }
+
+  .bottom-panel-body {
+    height: 160px !important;
+  }
+
+  .chart-legend { max-width: 100%; overflow-x: auto; overflow-y: hidden; flex-wrap: nowrap !important; gap: 8px !important; padding-right: 4px; }
+
+  .chart-legend-item {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  #chart-tooltip {
+    display: none !important;
+  }
+}
+
+@media (min-width:1301px) {
+  .app-main {
+    flex-direction: row !important;
+    overflow: hidden !important;
+  }
+
+  .app-center {
+    order: 0 !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    width: auto !important;
+  }
+
+  .chart-wrap {
+    min-height: 0 !important;
+    height: auto !important;
+    flex: 1 1 auto !important;
+  }
+
+  .sidebar-panel {
+    order: 0 !important;
+    width: 248px !important;
+    border-right: 1px solid var(--b1) !important;
+    border-top: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  .right-panel {
+    order: 0 !important;
+    width: 210px !important;
+    border-left: 1px solid var(--b1) !important;
+    border-top: none !important;
+    overflow-y: auto !important;
+    display: flex !important;
+  }
+
+  .bottom-panel-body {
+    height: 200px !important;
+  }
+}
+
+@media (max-width:600px) {
+  .app-center {
+    min-height: auto !important;
+    height: auto !important;
+    width: 100% !important;
+  }
+
+  .chart-wrap {
+    height: 38vh !important;
+    min-height: 250px !important;
+    flex: 0 0 auto !important;
+  }
+
+  .bottom-panel-body {
+    height: 38vh !important;
+    min-height: 250px !important;
+  }
+
+  .sidebar-panel,
+  .right-panel {
+    font-size: 10px;
+  }
+
+  .sidebar-panel {
+    max-height: none !important;
+    overflow-y: visible !important;
+  }
+
+  .right-panel {
+    display: flex !important;
+    max-height: none !important;
+    height: auto !important;
+    overflow-y: visible !important;
+  }
+
+  .chart-legend {
+    max-width: calc(100% - 14px);
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    padding: 2px 4px;
+    background: transparent;
+    border: 1px solid var(--b1);
+    border-radius: 4px;
+    backdrop-filter: none;
+  }
+
+  .chart-legend-item {
+    flex: 0 0 auto;
+    font-size: 7px !important;
+    white-space: nowrap;
+  }
+}
+
+/* Landscape phones: prioritize chart + trade history height */
+@media (max-width:1300px) and (max-height:560px) and (orientation: landscape) {
+  .app-center {
+    min-height: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .chart-wrap {
+    height: 46vh !important;
+    min-height: 210px !important;
+  }
+
+  .bottom-panel-body {
+    height: 36vh !important;
+    min-height: 170px !important;
+  }
+
+  .topbar {
+    row-gap: 3px !important;
+    padding: 4px 8px !important;
+  }
 }

@@ -13,10 +13,10 @@ const useStore = create((set, get) => ({
   darkMode: false,
 
   // Strategy toggles
-  stratOn: { ema: true, ob: true, fvg: true, of: false, ls: false, vwap: false, vp: false },
+  stratOn: { ema: true, ob: true, fvg: true, ifvg: false, of: false, ls: false, vwap: false, vp: false },
 
   // Layer toggles
-  layers: { ob: true, fvg: true, ls: true, lvl: true, sig: true, ema: true, vwap: true, vp: true },
+  layers: { ob: false, fvg: false, ifvg: false, ls: false, lvl: false, sig: false, ema: true, vwap: false, vp: false },
 
   // Data
   candles: [],
@@ -24,6 +24,7 @@ const useStore = create((set, get) => ({
   ema2: [],
   obs: [],
   fvgs: [],
+  ifvgs: [],
   session: { pc: null, ph: null, pl: null, do_: null, dh: null, dl: null },
   vwapData: null,
   vpData: null,
@@ -63,8 +64,8 @@ const useStore = create((set, get) => ({
   addLog: (msg, type = 'm') => set(s => ({ logs: [...s.logs.slice(-200), { type: 'l' + type, msg }] })),
   clearLog: () => set({ logs: [] }),
 
-  setData: (candles, ema1, ema2, obs, fvgs, session, vwapData, vpData) =>
-    set({ candles, ema1, ema2, obs, fvgs, session: session || { pc: null, ph: null, pl: null, do_: null, dh: null, dl: null }, vwapData, vpData }),
+  setData: (candles, ema1, ema2, obs, fvgs, ifvgs, session, vwapData, vpData) =>
+    set({ candles, ema1, ema2, obs, fvgs, ifvgs, session: session || { pc: null, ph: null, pl: null, do_: null, dh: null, dl: null }, vwapData, vpData }),
 
   setResults: results => set({ results }),
   setScanning: scanning => set({ scanning }),

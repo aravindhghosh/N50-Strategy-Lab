@@ -5,6 +5,7 @@ const STRATEGIES = [
   { key: 'ema', icon: '📈', cls: 'rgba(255,200,50,0.08)', name: 'EMA CROSS', sub: '9/21 momentum' },
   { key: 'ob', icon: '🧱', cls: 'rgba(74,144,226,0.08)', name: 'ORDER BLOCK', sub: 'Supply/demand zones' },
   { key: 'fvg', icon: '⚡', cls: 'rgba(159,122,234,0.08)', name: 'FAIR VALUE GAP', sub: 'Price imbalance' },
+  { key: 'ifvg', icon: '♻️', cls: 'rgba(118,177,255,0.10)', name: 'INVERSE FVG', sub: 'Inversion gap retest' },
   { key: 'of', icon: '🌊', cls: 'rgba(255,107,53,0.08)', name: 'ORDER FLOW*', sub: 'Synthetic delta momentum' },
   { key: 'ls', icon: '💧', cls: 'rgba(247,197,159,0.08)', name: 'LIQUIDITY SWEEP', sub: 'Stop hunt reversal' },
   { key: 'vwap', icon: '📐', cls: 'rgba(0,191,174,0.08)', name: 'ANCHORED VWAP', sub: 'Volume fair value' },
@@ -77,7 +78,7 @@ export default function Sidebar({ onRunScan, onShowSR, onShowSRAnalysis }) {
   const bestCombo = results?.combos?.[0];
 
   return (
-    <div style={{ width: 248, flexShrink: 0, background: 'var(--p1)', borderRight: '1px solid var(--b1)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div className="sidebar-panel" style={{ width: 248, flexShrink: 0, background: 'var(--p1)', borderRight: '1px solid var(--b1)', display: 'flex', flexDirection: 'column', overflowY: 'auto', overflowX: 'hidden' }}>
       {/* Scan buttons */}
       <div style={{ padding: '8px 10px', borderBottom: '1px solid var(--b1)', display: 'flex', flexDirection: 'column', gap: 6 }}>
         <button className="btn-scan" onClick={onRunScan} disabled={scanning}>
@@ -89,7 +90,7 @@ export default function Sidebar({ onRunScan, onShowSR, onShowSRAnalysis }) {
         </div>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
+      <div style={{ flex: 1, overflow: 'visible' }}>
         {/* Strategies */}
         <div style={{ borderBottom: '1px solid var(--b1)' }}>
           <div style={{ padding: '7px 11px', fontSize: 7, letterSpacing: 2, color: 'var(--t3)', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 6, background: 'var(--p2)', borderBottom: '1px solid var(--b1)' }}>

@@ -6,7 +6,7 @@ const PAD = { t: 12, r: 70, b: 34, l: 6 };
 
 // View state (mutable, not in React state for perf)
 const V = { s: 0, e: 0, pLo: null, pHi: null, drag: false, dtype: '', dx: 0, dy: 0, dvs: 0, dve: 0, dpLo: 0, dpHi: 0, mmDrag: false, mmStartX: 0, mmStartS: 0, mmStartE: 0 };
-let G_ref = { candles: [], ema1: [], ema2: [], obs: [], fvgs: [], session: {}, vwapData: null, vpData: null, layers: {}, results: null, hoverIdx: -1, emaFast: 9, emaSlow: 21, tf: '15', _vis: null, _vs: 0, _xOf: null, _yOf: null, _pLo: 0, _pHi: 1, _cW: 0, _cH: 0, _barCount: 0, lsMarks: [] };
+let G_ref = { candles: [], ema1: [], ema2: [], obs: [], fvgs: [], ifvgs: [], session: {}, vwapData: null, vpData: null, layers: {}, results: null, hoverIdx: -1, emaFast: 9, emaSlow: 21, tf: '15', _vis: null, _vs: 0, _xOf: null, _yOf: null, _pLo: 0, _pHi: 1, _cW: 0, _cH: 0, _barCount: 0, lsMarks: [] };
 
 export default function ChartCanvas({ onNavInfo }) {
   const canvasRef = useRef(null);
@@ -21,8 +21,8 @@ export default function ChartCanvas({ onNavInfo }) {
 
   // Sync G_ref from store
   useEffect(() => {
-    G_ref = { ...G_ref, candles: store.candles, ema1: store.ema1, ema2: store.ema2, obs: store.obs, fvgs: store.fvgs, session: store.session, vwapData: store.vwapData, vpData: store.vpData, layers: store.layers, results: store.results, emaFast: store.emaFast, emaSlow: store.emaSlow, tf: store.tf };
-  }, [store.candles, store.ema1, store.ema2, store.obs, store.fvgs, store.session, store.vwapData, store.vpData, store.layers, store.results, store.emaFast, store.emaSlow, store.tf]);
+    G_ref = { ...G_ref, candles: store.candles, ema1: store.ema1, ema2: store.ema2, obs: store.obs, fvgs: store.fvgs, ifvgs: store.ifvgs, session: store.session, vwapData: store.vwapData, vpData: store.vpData, layers: store.layers, results: store.results, emaFast: store.emaFast, emaSlow: store.emaSlow, tf: store.tf };
+  }, [store.candles, store.ema1, store.ema2, store.obs, store.fvgs, store.ifvgs, store.session, store.vwapData, store.vpData, store.layers, store.results, store.emaFast, store.emaSlow, store.tf]);
 
   useEffect(() => {
     const can = store.candles || [];
@@ -150,6 +150,43 @@ export default function ChartCanvas({ onNavInfo }) {
         ctx.beginPath(); ctx.moveTo(x1, y2); ctx.lineTo(x2, y2); ctx.stroke();
         ctx.setLineDash([]); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x1, y2); ctx.stroke();
         if (h > 10) { ctx.globalAlpha = f.filled ? 0.4 : 1; ctx.fillStyle = bc; ctx.font = "bold 7px 'JetBrains Mono',monospace"; ctx.textAlign = 'left'; ctx.fillText((isBull ? 'FVG+' : 'FVG-') + (f.filled ? ' ✓' : ''), x1 + 4, (y1 + y2) / 2 + 3); }
+        ctx.restore();
+      });
+    }
+
+    // iFVGs
+    if (G_ref.layers.ifvg) {
+      G_ref.ifvgs.filter(f => {
+        const ai = f.invIdx ?? f.idx;
+        return ai >= vs - 2 && ai <= ve;
+      }).forEach(f => {
+        const isBull = f.type === 'bull';
+        const y1 = yOf(f.top), y2 = yOf(f.bot), h = y2 - y1;
+        if (h < 0.5) return;
+        const fi = (f.invIdx ?? f.idx) - vs;
+        const endBar = f.active ? barCount - 1 : f.endIdx != null ? Math.min(barCount - 1, f.endIdx - vs) : Math.min(barCount - 1, fi + 20);
+        const x1 = fi >= 0 ? xOf(Math.max(0, fi - 1)) : PAD.l;
+        const x2 = endBar >= 0 ? xOf(Math.max(0, endBar)) + barW / 2 : PAD.l + 20;
+        if (x2 <= x1) return;
+        ctx.save();
+        ctx.globalAlpha = f.active ? 0.95 : 0.4;
+        ctx.fillStyle = isBull ? 'rgba(0,232,122,0.18)' : 'rgba(249,115,22,0.18)';
+        ctx.fillRect(x1, y1, x2 - x1, h);
+        const bc = isBull ? cssVar('--fvg-bull-border') : cssVar('--fvg-bear-border');
+        ctx.strokeStyle = bc;
+        ctx.lineWidth = 1.6;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y1); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x1, y2); ctx.lineTo(x2, y2); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x1, y2); ctx.stroke();
+        if (h > 9) {
+          ctx.fillStyle = bc;
+          ctx.font = "bold 8px 'JetBrains Mono',monospace";
+          ctx.textAlign = 'left';
+          ctx.fillText((isBull ? 'iFVG+' : 'iFVG-') + (f.active ? '' : ' ×'), x1 + 4, Math.max(y1 - 4, PAD.t + 10));
+        }
         ctx.restore();
       });
     }
@@ -340,9 +377,19 @@ export default function ChartCanvas({ onNavInfo }) {
   useEffect(() => {
     const canvas = canvasRef.current, wrap = wrapRef.current, mmWrap = mmWrapRef.current, vp = mmVpRef.current;
     if (!canvas || !wrap) return;
+    let touchStartDist = 0;
+    let pinchStartSpan = 0;
+    let pinchStartS = 0;
+    let pinchStartE = 0;
+    let touchPanX = 0;
     function inCanvas(e) {
       const r = canvas.getBoundingClientRect();
       return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+    }
+    function touchDist(t1, t2) {
+      const dx = t2.clientX - t1.clientX;
+      const dy = t2.clientY - t1.clientY;
+      return Math.sqrt(dx * dx + dy * dy);
     }
     function onWheel(e) {
       if (!inCanvas(e) || !G_ref.candles.length) return;
@@ -389,6 +436,74 @@ export default function ChartCanvas({ onNavInfo }) {
     function onDblClick(e) { if (!inCanvas(e) || !G_ref.candles.length) return; initView(); V.pLo = null; V.pHi = null; scheduleDraw(); }
     function onResize() { if (G_ref.candles.length) scheduleDraw(); }
 
+    function onTouchStart(e) {
+      if (!G_ref.candles.length) return;
+      if (e.touches.length === 1) {
+        const t = e.touches[0];
+        if (!inCanvas(t)) return;
+        e.preventDefault();
+        V.drag = true;
+        V.dtype = 'pan';
+        V.dvs = V.s;
+        V.dve = V.e;
+        touchPanX = t.clientX;
+      } else if (e.touches.length === 2) {
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        if (!inCanvas(t1) && !inCanvas(t2)) return;
+        e.preventDefault();
+        V.drag = false;
+        touchStartDist = touchDist(t1, t2);
+        pinchStartSpan = V.e - V.s;
+        pinchStartS = V.s;
+        pinchStartE = V.e;
+      }
+    }
+
+    function onTouchMove(e) {
+      if (!G_ref.candles.length) return;
+      if (e.touches.length === 1 && V.drag && V.dtype === 'pan') {
+        const t = e.touches[0];
+        e.preventDefault();
+        const cW = canvas.offsetWidth - PAD.l - PAD.r;
+        const span = V.dve - V.dvs;
+        const delta = Math.round(-(t.clientX - touchPanX) * (span / Math.max(1, cW)));
+        V.s = V.dvs + delta;
+        V.e = V.dve + delta;
+        V.pLo = null;
+        V.pHi = null;
+        clampView();
+        scheduleDraw();
+        return;
+      }
+      if (e.touches.length === 2) {
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        e.preventDefault();
+        const dist = touchDist(t1, t2);
+        if (!touchStartDist || !pinchStartSpan) return;
+        const factor = Math.max(0.5, Math.min(2.5, dist / touchStartDist));
+        const newSpan = Math.max(8, Math.min(G_ref.candles.length, Math.round(pinchStartSpan / factor)));
+        const midX = (t1.clientX + t2.clientX) / 2;
+        const r = canvas.getBoundingClientRect();
+        const frac = Math.max(0, Math.min(1, (midX - r.left - PAD.l) / Math.max(1, canvas.offsetWidth - PAD.l - PAD.r)));
+        const anchor = pinchStartS + (pinchStartE - pinchStartS) * frac;
+        V.s = anchor - newSpan * frac;
+        V.e = anchor + newSpan * (1 - frac);
+        V.pLo = null;
+        V.pHi = null;
+        clampView();
+        scheduleDraw();
+      }
+    }
+
+    function onTouchEnd() {
+      V.drag = false;
+      V.dtype = '';
+      touchStartDist = 0;
+      pinchStartSpan = 0;
+    }
+
     // Minimap drag
     function onMmMouseDown(e) { if (!G_ref.candles.length) return; e.stopPropagation(); V.mmDrag = true; V.mmStartX = e.clientX; V.mmStartS = V.s; V.mmStartE = V.e; }
     function onMmMouseMove(e) {
@@ -405,6 +520,22 @@ export default function ChartCanvas({ onNavInfo }) {
       V.pLo = null; V.pHi = null; clampView(); scheduleDraw();
     }
 
+    function onMmTouchStart(e) {
+      if (!G_ref.candles.length || e.touches.length !== 1) return;
+      V.mmDrag = true;
+      V.mmStartX = e.touches[0].clientX;
+      V.mmStartS = V.s;
+      V.mmStartE = V.e;
+    }
+    function onMmTouchMove(e) {
+      if (!V.mmDrag || !G_ref.candles.length || e.touches.length !== 1) return;
+      e.preventDefault();
+      const mmW = mmWrap?.offsetWidth || 400, n = G_ref.candles.length;
+      const delta = Math.round((e.touches[0].clientX - V.mmStartX) / mmW * n);
+      V.s = V.mmStartS + delta; V.e = V.mmStartE + delta; V.pLo = null; V.pHi = null; clampView(); scheduleDraw();
+    }
+    function onMmTouchEnd() { V.mmDrag = false; }
+
     window.addEventListener('wheel', onWheel, { passive: false });
     window.addEventListener('mousedown', onMouseDown);
     window.addEventListener('mousemove', onMouseMove);
@@ -412,8 +543,18 @@ export default function ChartCanvas({ onNavInfo }) {
     window.addEventListener('mouseleave', onMouseLeave);
     window.addEventListener('dblclick', onDblClick);
     window.addEventListener('resize', onResize);
+    canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+    canvas.addEventListener('touchend', onTouchEnd, { passive: true });
+    canvas.addEventListener('touchcancel', onTouchEnd, { passive: true });
     if (vp) { vp.addEventListener('mousedown', onMmMouseDown); window.addEventListener('mousemove', onMmMouseMove); window.addEventListener('mouseup', onMmMouseUp); }
     if (mmWrap) mmWrap.addEventListener('click', onMmClick);
+    if (mmWrap) {
+      mmWrap.addEventListener('touchstart', onMmTouchStart, { passive: true });
+      mmWrap.addEventListener('touchmove', onMmTouchMove, { passive: false });
+      mmWrap.addEventListener('touchend', onMmTouchEnd, { passive: true });
+      mmWrap.addEventListener('touchcancel', onMmTouchEnd, { passive: true });
+    }
 
     return () => {
       window.removeEventListener('wheel', onWheel);
@@ -423,8 +564,18 @@ export default function ChartCanvas({ onNavInfo }) {
       window.removeEventListener('mouseleave', onMouseLeave);
       window.removeEventListener('dblclick', onDblClick);
       window.removeEventListener('resize', onResize);
+      canvas.removeEventListener('touchstart', onTouchStart);
+      canvas.removeEventListener('touchmove', onTouchMove);
+      canvas.removeEventListener('touchend', onTouchEnd);
+      canvas.removeEventListener('touchcancel', onTouchEnd);
       if (vp) { vp.removeEventListener('mousedown', onMmMouseDown); window.removeEventListener('mousemove', onMmMouseMove); window.removeEventListener('mouseup', onMmMouseUp); }
       if (mmWrap) mmWrap.removeEventListener('click', onMmClick);
+      if (mmWrap) {
+        mmWrap.removeEventListener('touchstart', onMmTouchStart);
+        mmWrap.removeEventListener('touchmove', onMmTouchMove);
+        mmWrap.removeEventListener('touchend', onMmTouchEnd);
+        mmWrap.removeEventListener('touchcancel', onMmTouchEnd);
+      }
     };
   }, []);
 
@@ -439,18 +590,8 @@ export default function ChartCanvas({ onNavInfo }) {
   const navJump = where => { if (!G_ref.candles.length) return; const n = G_ref.candles.length, span = V.e - V.s; if (where === 'start') { V.s = 0; V.e = span; } else { V.s = n - span; V.e = n; } V.pLo = null; V.pHi = null; clampView(); scheduleDraw(); };
 
   return (
-    <div ref={wrapRef} style={{ flex: 1, position: 'relative', minHeight: 0, overflow: 'hidden', background: 'var(--chart-bg)' }}>
-      <canvas ref={canvasRef} style={{ display: 'block', cursor: 'crosshair' }} />
-
-      {/* Legend */}
-      <div style={{ position: 'absolute', top: 8, left: 10, display: 'flex', alignItems: 'center', gap: 10, pointerEvents: 'none', zIndex: 5, flexWrap: 'wrap' }}>
-        {[['EMA Fast', 'var(--yellow)', 'line'], ['EMA Slow', 'var(--blue)', 'line'], ['Bull OB', 'var(--ob-bull-fill)', 'box', 'var(--ob-bull-border)'], ['Bear OB', 'var(--ob-bear-fill)', 'box', 'var(--ob-bear-border)'], ['Bull FVG', 'var(--fvg-bull-fill)', 'box', 'var(--fvg-bull-border)'], ['Bear FVG', 'var(--fvg-bear-fill)', 'box', 'var(--fvg-bear-border)'], ['LS', '#f7c59f', 'line'], ['VWAP', '#00bfae', 'line'], ['POC', '#f97316', 'line']].map(([l, c, t, bc]) => (
-          <div key={l} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 8, color: 'var(--t2)' }}>
-            {t === 'line' ? <div style={{ width: 14, height: 2, borderRadius: 1, background: c }} /> : <div style={{ width: 10, height: 10, borderRadius: 2, background: c, border: `1px solid ${bc}` }} />}
-            {l}
-          </div>
-        ))}
-      </div>
+    <div className="chart-wrap" ref={wrapRef} style={{ flex: 1, position: 'relative', minHeight: 0, overflow: 'hidden', background: 'var(--chart-bg)' }}>
+      <canvas ref={canvasRef} style={{ display: 'block', cursor: 'crosshair', touchAction: 'none' }} />
 
       <div id="chart-tooltip" ref={tooltipRef} />
 

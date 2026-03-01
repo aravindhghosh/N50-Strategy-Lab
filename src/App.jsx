@@ -2,8 +2,8 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import useStore from './store/useStore';
 import { fetchYF, fetchSession, simSession } from './utils/dataFetch';
 import {
-  calcEMA, detectOBs, detectFVGs, calcAnchoredVWAP, calcVolumeProfile,
-  stratEMA, stratOB, stratFVG, stratOF, stratLS, stratVWAP, stratVP,
+  calcEMA, detectOBs, detectFVGs, detectIFVGs, calcAnchoredVWAP, calcVolumeProfile,
+  stratEMA, stratOB, stratFVG, stratIFVG, stratOF, stratLS, stratVWAP, stratVP,
   buildCombos, scanTrades
 } from './utils/indicators';
 import Topbar from './components/Topbar';
@@ -103,17 +103,19 @@ export default function App() {
       const ema2 = calcEMA(closes, emaSlow);
       const obs = detectOBs(candles);
       const fvgs = detectFVGs(candles);
+      const ifvgs = detectIFVGs(candles);
       const vwapData = calcAnchoredVWAP(candles);
       const vpData = calcVolumeProfile(candles.slice(-700));
       const session = sess || simSession(candles);
 
-      setData(candles, ema1, ema2, obs, fvgs, session, vwapData, vpData);
+      setData(candles, ema1, ema2, obs, fvgs, ifvgs, session, vwapData, vpData);
       log(`OBs: ${obs.length} (${obs.filter(o => o.active).length} active) | FVGs: ${fvgs.length} (${fvgs.filter(f => !f.filled).length} unfilled)`, 'i');
 
       const rawSigs = {
         ema: stratEMA(candles, ema1, ema2, rr),
         ob: stratOB(candles, ema1, ema2, rr),
         fvg: stratFVG(candles, ema1, ema2, rr),
+        ifvg: stratIFVG(candles, ema1, ema2, rr),
         of: stratOF(candles, ema1, ema2, rr),
         ls: stratLS(candles, ema1, ema2, rr),
         vwap: stratVWAP(candles, ema1, ema2, rr, vwapData),
@@ -125,8 +127,9 @@ export default function App() {
         .map(([, s]) => s);
       const combos = buildCombos(activeSigs, rr, capital, riskPct);
 
-      const sameCtx = st.results?.sym === curSym && st.results?.tf === curTf;
-      const existingTrades = sameCtx ? (st.results?.trades || []) : [];
+      const latestResults = useStore.getState().results;
+      const sameCtx = latestResults?.sym === curSym && latestResults?.tf === curTf;
+      const existingTrades = sameCtx ? (latestResults?.trades || []) : [];
       if (!fullHistory) log('Live refresh: signals updated (history unchanged)', 'i');
       setResults({ rawSigs, activeSigs, combos, trades: existingTrades, capital, riskPct, rr, sym: curSym, tf: curTf });
       log('Scan complete', 's');
@@ -139,7 +142,7 @@ export default function App() {
         const runBacktest = () => {
           if (backtestTokenRef.current !== btToken) return;
           const cur = useStore.getState();
-          if (cur.sym !== curSym || cur.tf !== curTf || runTokenRef.current !== runToken) return;
+          if (cur.sym !== curSym || cur.tf !== curTf) return;
           const trades = scanTrades(candles, ema1, ema2, rr, btLookback, stratOn);
           if (backtestTokenRef.current !== btToken) return;
           const wins = trades.filter(t => t.outcome === 'WIN').length;
@@ -205,6 +208,17 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    const id = setTimeout(() => {
+      const st = useStore.getState();
+      const hasTrades = !!st.results?.trades?.length;
+      if (st.candles?.length && !hasTrades && runScanRef.current) {
+        runScanRef.current('auto-backfill', { fullHistory: true });
+      }
+    }, 3200);
+    return () => clearTimeout(id);
+  }, [sym, tf]);
+
+  useEffect(() => {
     const id = setInterval(() => {
       if (!document.hidden && isMarketOpenIST() && runScanRef.current) {
         pollTickRef.current += 1;
@@ -216,13 +230,13 @@ export default function App() {
   }, []);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div className="app-root" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Topbar onShowGuide={() => setShowGuide(true)} onShowWeek={() => setInsightType('week')} />
 
-      <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+      <div className="app-main" style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
         <Sidebar onRunScan={() => runScan('manual')} onShowSR={() => setInsightType('sr')} onShowSRAnalysis={() => setInsightType('sra')} />
 
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
+        <div className="app-center" style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
           <ChartToolbar navInfo={navInfo} />
           <ChartCanvas onNavInfo={setNavInfo} />
           <BottomPanel />

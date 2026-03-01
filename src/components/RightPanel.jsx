@@ -30,11 +30,11 @@ export default function RightPanel() {
     return { text: `${s.dir} (C:${s.conf})`, color: s.dir === 'LONG' ? 'var(--green)' : 'var(--red)' };
   }
 
-  const sigKeys = ['ema', 'ob', 'fvg', 'of', 'ls', 'vwap', 'vp'];
-  const sigLabels = { ema: 'EMA Signal', ob: 'OB Signal', fvg: 'FVG Signal', of: 'Order Flow', ls: 'Liq. Sweep', vwap: 'VWAP Signal', vp: 'Vol. Profile' };
+  const sigKeys = ['ema', 'ob', 'fvg', 'ifvg', 'of', 'ls', 'vwap', 'vp'];
+  const sigLabels = { ema: 'EMA Signal', ob: 'OB Signal', fvg: 'FVG Signal', ifvg: 'iFVG Signal', of: 'Order Flow', ls: 'Liq. Sweep', vwap: 'VWAP Signal', vp: 'Vol. Profile' };
 
   return (
-    <div style={{ width: 210, flexShrink: 0, background: 'var(--p1)', borderLeft: '1px solid var(--b1)', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+    <div className="right-panel" style={{ width: 210, flexShrink: 0, background: 'var(--p1)', borderLeft: '1px solid var(--b1)', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
       <div style={{ padding: '7px 11px', fontSize: 7, letterSpacing: 2, color: 'var(--t3)', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 6, background: 'var(--p2)', borderBottom: '1px solid var(--b1)' }}>
         <div className="dot" />LIVE STATS
       </div>

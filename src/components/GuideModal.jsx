@@ -51,7 +51,23 @@ export default function GuideModal({ onClose }) {
           <div style={{ marginBottom: 20 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--t1)', letterSpacing: '1.5px', borderBottom: '1px solid var(--b1)', paddingBottom: 5, marginBottom: 10 }}>📈 STRATEGIES - How Each One Works</div>
 
-            {[['var(--yellow)', '📈 EMA CROSS (9/21)', 'Signals when the fast EMA (9) crosses the slow EMA (21). LONG when fast crosses above slow and price is above both; SHORT when fast crosses below. Confidence is highest on a fresh cross (C:3), lower during sustained trend (C:2) or weak separation (C:1). Stop is 1.5x ATR from entry.'], ['var(--blue)', '🧱 ORDER BLOCK (OB)', 'Identifies the last bearish candle before a strong bullish impulse (Bull OB) or last bullish candle before a strong bearish push (Bear OB). A signal fires when price returns to retest the OB. Active OBs show in solid boxes; broken ones fade with X. Confidence is boosted when EMA agrees.'], ['var(--purple)', '⚡ FAIR VALUE GAP (FVG)', 'A 3-candle pattern where the body of candle 1 and candle 3 do not overlap, leaving a gap that markets tend to fill. Bull FVG = gap above, Bear FVG = gap below. Signal fires when price approaches an unfilled FVG.'], ['#ff6b35', '🌊 ORDER FLOW* (Synthetic)', 'Synthetic estimate of buying vs selling pressure from candle structure and volume. Signal fires when synthetic delta momentum agrees with EMA direction.'], ['#f7c59f', '💧 LIQUIDITY SWEEP', 'Detects when price wicks beyond a recent swing high/low (stop hunt) and then reverses.'], ['#00bfae', '📐 ANCHORED VWAP', 'VWAP anchored from the start of the current session. LONG when price is above AVWAP and bouncing from +1SD; SHORT when below and bouncing from -1SD.'], ['#a8d8ea', '📦 VOLUME PROFILE* (Approx POC)', 'Approximate profile using candle-range volume distribution to estimate POC, VAH and VAL.']].map(([c, name, desc]) => (
+            {[
+              ['var(--yellow)', '📈 EMA CROSS (9/21)', 'Signals when the fast EMA (9) crosses the slow EMA (21). LONG when fast crosses above slow and price is above both; SHORT when fast crosses below. Confidence is highest on a fresh cross (C:3), lower during sustained trend (C:2) or weak separation (C:1). Stop is 1.5x ATR from entry.'], 
+              ['var(--blue)', '🧱 ORDER BLOCK (OB)', 'Identifies the last bearish candle before a strong bullish impulse (Bull OB) or last bullish candle before a strong bearish push (Bear OB). A signal fires when price returns to retest the OB. Active OBs show in solid boxes; broken ones fade with X. Confidence is boosted when EMA agrees.'], 
+              ['var(--purple)', '⚡ FAIR VALUE GAP (FVG)', 'A 3-candle pattern where the body of candle 1 and candle 3 do not overlap, leaving a gap that markets tend to fill. Bull FVG = gap above, Bear FVG = gap below. Signal fires when price approaches an unfilled FVG.'], 
+              ['#f505b9', '🔄 INVERSE FVG (iFVG)', (
+                <>
+                  An iFVG forms when a regular FVG gets <b style={{ color: 'var(--t1)' }}>filled and then rejected</b> — the gap zone flips polarity and acts as the opposite structure. 
+                  A Bear FVG that gets filled and rejected becomes a <b style={{ color: '#ff6496' }}>Bull iFVG</b> (pink zone, support for LONG). 
+                  A Bull FVG that gets filled and rejected becomes a <b style={{ color: '#9664ff' }}>Bear iFVG</b> (violet zone, resistance for SHORT). 
+                  Signal fires when price returns to retest the flipped zone. 
+                  Drawn with diagonal hatching to distinguish from regular FVGs.
+                </>
+              )], 
+              ['#ff6b35', '🌊 ORDER FLOW* (Synthetic)', 'Synthetic estimate of buying vs selling pressure from candle structure and volume. Signal fires when synthetic delta momentum agrees with EMA direction.'], 
+              ['#f7c59f', '💧 LIQUIDITY SWEEP', 'Detects when price wicks beyond a recent swing high/low (stop hunt) and then reverses.'], 
+              ['#00bfae', '📐 ANCHORED VWAP', 'VWAP anchored from the start of the current session. LONG when price is above AVWAP and bouncing from +1SD; SHORT when below and bouncing from -1SD.'], ['#a8d8ea', '📦 VOLUME PROFILE* (Approx POC)', 'Approximate profile using candle-range volume distribution to estimate POC, VAH and VAL.']
+            ].map(([c, name, desc]) => (
               <div key={name} style={{ marginBottom: 10, background: 'var(--p2)', border: '1px solid var(--b1)', borderRadius: 5, padding: '10px 12px' }}>
                 <div style={{ color: c, fontWeight: 700, fontSize: 10, marginBottom: 4 }}>{name}</div>
                 <div>{desc}</div>
